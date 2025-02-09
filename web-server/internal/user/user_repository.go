@@ -2,7 +2,9 @@ package user
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/danicatalao/notifier/web-server/pkg/database"
 )
@@ -20,24 +22,49 @@ type user_repository struct {
 }
 
 func NewUserRepository(db *database.Service) *user_repository {
+	fmt.Printf("%+v\n", db)
 	return &user_repository{db}
 }
 
 func (r *user_repository) Create(ctx context.Context, u *AppUser) error {
 	query, args, err := r.Builder.
 		Insert(APP_USER_TABLE).
-		Columns("name, email, phone_number, webhook, opt_out_date").
-		Values(u.Name, u.Email, u.GetPhoneNumber(), u.GetWebhook(), u.GetOptOutDate()).
+		Columns("name, email").
+		Values(u.Name, u.Email).
 		ToSql()
+	query += " RETURNING id"
+
+	fmt.Printf("%s\n", query)
 
 	if err != nil {
 		return fmt.Errorf("user repository - adduser - could not build query: %w", err)
 	}
 
-	_, err = r.Pool.Exec(ctx, query, args...)
+	var id int64
+	err = r.Pool.QueryRow(ctx, query, args...).Scan(&id)
 	if err != nil {
-		return fmt.Errorf("user repository - adduser - could not insert User: %w", err)
+		return fmt.Errorf("queryrow failed: %w", err)
 	}
-
+	fmt.Printf("ID do usuario: %d", id)
 	return nil
+}
+
+func NewNullString(s *string) sql.NullString {
+	if s == nil {
+		return sql.NullString{Valid: false}
+	}
+	return sql.NullString{
+		String: *s,
+		Valid:  true,
+	}
+}
+
+func NewNullTime(t *time.Time) sql.NullTime {
+	if t == nil {
+		return sql.NullTime{Valid: false}
+	}
+	return sql.NullTime{
+		Time:  *t,
+		Valid: true,
+	}
 }

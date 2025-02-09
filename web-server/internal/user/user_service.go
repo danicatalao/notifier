@@ -2,7 +2,7 @@ package user
 
 import (
 	"context"
-	"errors"
+	"fmt"
 )
 
 type UserService interface {
@@ -24,7 +24,7 @@ func NewUserService(r UserRepository) *user_service {
 func (u *user_service) CreateUser(ctx context.Context, user *AppUser) error {
 	err := u.repository.Create(ctx, user)
 	if err != nil {
-		return errors.New("error trying to add a user")
+		return fmt.Errorf("error trying to add a user: %w", err)
 	}
 	return nil
 }
