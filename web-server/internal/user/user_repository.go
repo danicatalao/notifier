@@ -29,8 +29,8 @@ func NewUserRepository(db *database.Service) *user_repository {
 func (r *user_repository) Create(ctx context.Context, u *AppUser) error {
 	query, args, err := r.Builder.
 		Insert(APP_USER_TABLE).
-		Columns("name, email").
-		Values(u.Name, u.Email).
+		Columns("name, email, phone_number, webhook").
+		Values(u.Name, u.Email, u.PhoneNumber, u.Webhook).
 		ToSql()
 	query += " RETURNING id"
 
