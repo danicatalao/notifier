@@ -35,10 +35,15 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 
 	fmt.Printf("%+v\n", user)
 
-	if err := h.service.CreateUser(c.Request.Context(), &user); err != nil {
+	id, err := h.service.CreateUser(c.Request.Context(), &user)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, "Hello World")
+	c.JSON(http.StatusOK, &CreateUserReturn{id})
+}
+
+type CreateUserReturn struct {
+	Id int64 `json:"id"`
 }

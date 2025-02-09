@@ -1,4 +1,4 @@
-module github.com/danicatalao/notifier/web-server
+module github.com/danicatalao/notifier
 
 go 1.23.6
 

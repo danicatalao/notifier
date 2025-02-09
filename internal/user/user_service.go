@@ -6,7 +6,7 @@ import (
 )
 
 type UserService interface {
-	CreateUser(ctx context.Context, user *AppUser) error
+	CreateUser(ctx context.Context, user *AppUser) (int64, error)
 	// List(ctx context.Context) ([]AppUser, error)
 	// GetByID(ctx context.Context, id int64) (*AppUser, error)
 	// Update(ctx context.Context, user *AppUser) error
@@ -21,10 +21,10 @@ func NewUserService(r UserRepository) *user_service {
 	return &user_service{repository: r}
 }
 
-func (u *user_service) CreateUser(ctx context.Context, user *AppUser) error {
-	err := u.repository.Create(ctx, user)
+func (u *user_service) CreateUser(ctx context.Context, user *AppUser) (int64, error) {
+	id, err := u.repository.Create(ctx, user)
 	if err != nil {
-		return fmt.Errorf("error trying to add a user: %w", err)
+		return -1, fmt.Errorf("error trying to add a user: %w", err)
 	}
-	return nil
+	return id, nil
 }

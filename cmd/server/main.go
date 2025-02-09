@@ -5,9 +5,9 @@ import (
 	"net"
 	"os"
 
-	"github.com/danicatalao/notifier/web-server/configs"
-	"github.com/danicatalao/notifier/web-server/internal/user"
-	postgres "github.com/danicatalao/notifier/web-server/pkg/database"
+	"github.com/danicatalao/notifier/configs"
+	"github.com/danicatalao/notifier/internal/user"
+	postgres "github.com/danicatalao/notifier/pkg/database"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
