@@ -20,7 +20,6 @@ type user_repository struct {
 }
 
 func NewUserRepository(db *database.Service) *user_repository {
-	fmt.Printf("%+v\n", db)
 	return &user_repository{db}
 }
 
