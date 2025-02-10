@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"net"
+	"net/http"
 	"os"
+	"time"
 
 	"github.com/danicatalao/notifier/configs"
 	"github.com/danicatalao/notifier/internal/scheduled_notification"
@@ -32,6 +34,8 @@ func main() {
 	}
 	defer db.Close()
 	log.Info("Connection pool created on Postgres")
+
+	httpClient := &http.Client{Timeout: 10 * time.Second}
 
 	userRepository := user.NewUserRepository(db)
 	userService := user.NewUserService(userRepository)

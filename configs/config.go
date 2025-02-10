@@ -4,8 +4,9 @@ import "github.com/ilyakaznacheev/cleanenv"
 
 type (
 	Config struct {
-		PG   `env-prefix:"PG_" env-required:"true"`
-		HTTP `env-prefix:"HTTP_" env-required:"true"`
+		PG                `env-prefix:"PG_" env-required:"true"`
+		HTTP              `env-prefix:"HTTP_" env-required:"true"`
+		FORECAST_PROVIDER `env-prefix:"FORECAST_PROVIDER_" env-required:"true"`
 	}
 
 	PG struct {
@@ -16,6 +17,10 @@ type (
 
 	HTTP struct {
 		Port string `env:"PORT" env-default:"8080"`
+	}
+
+	FORECAST_PROVIDER struct {
+		URL string `env:"URL"`
 	}
 )
 
