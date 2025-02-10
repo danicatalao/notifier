@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS app_user (
 
 CREATE TABLE IF NOT EXISTS scheduled_notification (
     id SERIAL PRIMARY KEY,
-    status VARCHAR(50) NOT NULL CHECK (status IN ('pending', 'sent', 'failed')),
-    date TIMESTAMPZ NOT NULL,
+    status VARCHAR(50) NOT NULL CHECK (status IN ('pending', 'sent', 'failed')) DEFAULT 'pending',
+    date TIMESTAMPTZ NOT NULL,
     city_name VARCHAR(255) NOT NULL,
     user_id INT NOT NULL REFERENCES app_user(id),
     notification_type VARCHAR(50) NOT NULL CHECK (notification_type IN ('webhook', 'email', 'sms', 'push')),

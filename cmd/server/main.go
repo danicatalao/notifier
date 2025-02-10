@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/danicatalao/notifier/configs"
+	"github.com/danicatalao/notifier/internal/scheduled_notification"
 	"github.com/danicatalao/notifier/internal/user"
 	postgres "github.com/danicatalao/notifier/pkg/database"
 	"github.com/gin-gonic/gin"
@@ -36,11 +37,16 @@ func main() {
 	userService := user.NewUserService(userRepository)
 	userHandler := user.NewUserHandler(userService)
 
+	scheduledNotificationRepository := scheduled_notification.NewScheduledNotificationRepository(db)
+	scheduledNotificationService := scheduled_notification.NewScheduledNotificationService(scheduledNotificationRepository)
+	scheduledNotificationHandler := scheduled_notification.NewScheduledNotificationHandler(scheduledNotificationService)
+
 	// HTTP Server
 	r := gin.Default()
 	v1 := r.Group("/api/v1")
 	{
 		userHandler.AddUserRoutes(v1)
+		scheduledNotificationHandler.AddNotificationRoutes(v1)
 	}
 
 	r.Run(net.JoinHostPort("", cfg.HTTP.Port))

@@ -21,8 +21,8 @@ func NewUserService(r UserRepository) *user_service {
 	return &user_service{repository: r}
 }
 
-func (u *user_service) CreateUser(ctx context.Context, user *AppUser) (int64, error) {
-	id, err := u.repository.Create(ctx, user)
+func (s *user_service) CreateUser(ctx context.Context, user *AppUser) (int64, error) {
+	id, err := s.repository.Create(ctx, user)
 	if err != nil {
 		return -1, fmt.Errorf("error trying to add a user: %w", err)
 	}

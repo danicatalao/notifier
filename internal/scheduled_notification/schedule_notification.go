@@ -2,7 +2,7 @@ package scheduled_notification
 
 import "time"
 
-const SCHEDULED_NOTIFICATION_TABLE = "app_user"
+const SCHEDULED_NOTIFICATION_TABLE = "scheduled_notification"
 
 type ScheduledNotification struct {
 	ID               int64              `json:"id" db:"id"`
