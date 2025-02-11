@@ -1,17 +1,19 @@
 package forecast
 
-import "encoding/xml"
+type WaveForecast struct {
+	Name          string `xml:"nome" json:"nome"`
+	State         string `xml:"uf" json:"uf"`
+	Updated       string `xml:"atualizacao" json:"atualizacao"`
+	MorningWave   Wave   `xml:"manha" json:"manha"`
+	AfternoonWave Wave   `xml:"tarde" json:"tarde"`
+	NightWave     Wave   `xml:"noite" json:"noite"`
+}
 
 type Wave struct {
-	XMLName  xml.Name `xml:"cidade"`
-	CityCode string   `xml:"codigo"`
-	Name     string   `xml:"nome"`
-	State    string   `xml:"uf"`
-	Updated  string   `xml:"atualizacao"`
-	Waves    []struct {
-		Date      string `xml:"dia"`
-		Wave      string `xml:"altura"`
-		Direction string `xml:"direcao"`
-		Agitation string `xml:"agitacao"`
-	} `xml:"previsao"`
+	Date          string  `xml:"dia" json:"dia"`
+	Agitation     string  `xml:"agitacao" json:"agitacao"`
+	Height        float32 `xml:"altura" json:"altura"`
+	Direction     string  `xml:"direcao" json:"direcao"`
+	Wind          float32 `xml:"vento" json:"vento"`
+	WindDirection string  `xml:"vento_dir" json:"vento_dir"`
 }

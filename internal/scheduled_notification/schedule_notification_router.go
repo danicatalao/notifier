@@ -15,11 +15,11 @@ func NewScheduledNotificationHandler(s ScheduledNotificationService) *ScheduledN
 	return &ScheduledNotificationHandler{service: s}
 }
 
-func (sn *ScheduledNotificationHandler) AddNotificationRoutes(r *gin.RouterGroup) {
+func (h *ScheduledNotificationHandler) AddNotificationRoutes(r *gin.RouterGroup) {
 
 	userRoutes := r.Group("/notification")
 	{
-		userRoutes.POST("/", sn.CreateScheduledNotification)
+		userRoutes.POST("/", h.CreateScheduledNotification)
 	}
 }
 

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/danicatalao/notifier/configs"
+	"github.com/danicatalao/notifier/internal/forecast"
 	"github.com/danicatalao/notifier/internal/scheduled_notification"
 	"github.com/danicatalao/notifier/internal/user"
 	postgres "github.com/danicatalao/notifier/pkg/database"
@@ -37,6 +38,9 @@ func main() {
 
 	httpClient := &http.Client{Timeout: 10 * time.Second}
 
+	forecastApiClient := forecast.NewForecastApiClient(httpClient, cfg.FORECAST_PROVIDER.URL)
+	forecastHandler := forecast.NewForecastHandler(*forecastApiClient)
+
 	userRepository := user.NewUserRepository(db)
 	userService := user.NewUserService(userRepository)
 	userHandler := user.NewUserHandler(userService)
@@ -49,6 +53,7 @@ func main() {
 	r := gin.Default()
 	v1 := r.Group("/api/v1")
 	{
+		forecastHandler.AddForecastRoutes(v1)
 		userHandler.AddUserRoutes(v1)
 		scheduledNotificationHandler.AddNotificationRoutes(v1)
 	}
