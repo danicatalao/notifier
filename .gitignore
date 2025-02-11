@@ -8,3 +8,5 @@
 go.work
 go.work.sum
 /pg-data
+/rabbitmq_data
+/rabbitmq_log
