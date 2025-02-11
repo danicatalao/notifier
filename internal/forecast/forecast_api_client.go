@@ -19,8 +19,8 @@ type ForecastApiClient struct {
 	baseUrl    string
 }
 
-func NewForecastApiClient(c HttpClient, s string) *ForecastApiClient {
-	return &ForecastApiClient{
+func NewForecastApiClient(c HttpClient, s string) ForecastApiClient {
+	return ForecastApiClient{
 		httpClient: c,
 		baseUrl:    s,
 	}

@@ -10,10 +10,10 @@ type WaveForecast struct {
 }
 
 type Wave struct {
-	Date          string  `xml:"dia" json:"dia"`
-	Agitation     string  `xml:"agitacao" json:"agitacao"`
-	Height        float32 `xml:"altura" json:"altura"`
-	Direction     string  `xml:"direcao" json:"direcao"`
-	Wind          float32 `xml:"vento" json:"vento"`
-	WindDirection string  `xml:"vento_dir" json:"vento_dir"`
+	Date          string `xml:"dia" json:"dia"`
+	Agitation     string `xml:"agitacao" json:"agitacao"`
+	Height        string `xml:"altura" json:"altura"`
+	Direction     string `xml:"direcao" json:"direcao"`
+	Wind          string `xml:"vento" json:"vento"`
+	WindDirection string `xml:"vento_dir" json:"vento_dir"`
 }

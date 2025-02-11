@@ -39,7 +39,8 @@ func main() {
 	httpClient := &http.Client{Timeout: 10 * time.Second}
 
 	forecastApiClient := forecast.NewForecastApiClient(httpClient, cfg.FORECAST_PROVIDER.URL)
-	forecastHandler := forecast.NewForecastHandler(*forecastApiClient)
+	forecastService := forecast.NewForecastService(forecastApiClient)
+	forecastHandler := forecast.NewForecastHandler(forecastApiClient, forecastService)
 
 	userRepository := user.NewUserRepository(db)
 	userService := user.NewUserService(userRepository)

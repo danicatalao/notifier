@@ -10,11 +10,12 @@ import (
 // Forecast provider wrapper for testing
 
 type ForecastHandler struct {
-	client ForecastApiClient
+	client  ForecastApiClient
+	service ForecastService
 }
 
-func NewForecastHandler(c ForecastApiClient) *ForecastHandler {
-	return &ForecastHandler{client: c}
+func NewForecastHandler(c ForecastApiClient, s ForecastService) *ForecastHandler {
+	return &ForecastHandler{client: c, service: s}
 }
 
 func (h *ForecastHandler) AddForecastRoutes(r *gin.RouterGroup) {
@@ -24,6 +25,7 @@ func (h *ForecastHandler) AddForecastRoutes(r *gin.RouterGroup) {
 		forecastRoutes.GET("/city", h.GetCityIDByName)
 		forecastRoutes.GET("/:id", h.GetForecast)
 		forecastRoutes.GET("/:id/wave/:day", h.GetWaves)
+		forecastRoutes.GET("/fw/:cityName", h.GetForeCastAndWave)
 	}
 }
 
@@ -64,4 +66,16 @@ func (h *ForecastHandler) GetWaves(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, wave)
+}
+
+func (h *ForecastHandler) GetForeCastAndWave(c *gin.Context) {
+	cityName := c.Param("cityName")
+
+	forecastWave, err := h.service.GetForecastAndWave(cityName)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, forecastWave)
 }
