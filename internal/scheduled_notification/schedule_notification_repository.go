@@ -24,7 +24,7 @@ func (r *scheduled_notification_repository) Create(ctx context.Context, sn *Sche
 	query, args, err := r.Builder.
 		Insert(SCHEDULED_NOTIFICATION_TABLE).
 		Columns("date, city_name, user_id, notification_type").
-		Values(sn.Date, sn.CityName, sn.UserID, sn.NotificationType).
+		Values(sn.Date, sn.CityName, sn.UserId, sn.NotificationType).
 		ToSql()
 
 	fmt.Printf("%s\n", query)

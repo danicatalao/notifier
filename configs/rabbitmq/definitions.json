@@ -1,0 +1,207 @@
+{
+    "rabbit_version": "3.12.0",
+    "rabbitmq_version": "3.12.0",
+    "product_name": "RabbitMQ",
+    "product_version": "3.12.0",
+    "vhosts": [
+      {
+        "name": "/"
+      }
+    ],
+    "permissions": [
+      {
+        "user": "admin",
+        "vhost": "/",
+        "configure": ".*",
+        "write": ".*",
+        "read": ".*"
+      }
+    ],
+    "parameters": [],
+    "policies": [
+      {
+        "vhost": "/",
+        "name": "notification-ha-policy",
+        "pattern": "^(webhook|email|sms|push)\\.notifications$",
+        "priority": 1,
+        "definition": {
+          "ha-mode": "all",
+          "ha-sync-mode": "automatic",
+          "message-ttl": 86400000,
+          "dead-letter-exchange": "notifications.dlx"
+        }
+      }
+    ],
+    "queues": [
+      {
+        "name": "webhook.notifications",
+        "vhost": "/",
+        "durable": true,
+        "auto_delete": false,
+        "arguments": {
+          "x-dead-letter-exchange": "notifications.dlx",
+          "x-dead-letter-routing-key": "webhook.notifications.dead",
+          "x-max-length": 100000,
+          "x-message-ttl": 86400000
+        }
+      },
+      {
+        "name": "email.notifications",
+        "vhost": "/",
+        "durable": true,
+        "auto_delete": false,
+        "arguments": {
+          "x-dead-letter-exchange": "notifications.dlx",
+          "x-dead-letter-routing-key": "email.notifications.dead",
+          "x-max-length": 100000,
+          "x-message-ttl": 86400000
+        }
+      },
+      {
+        "name": "sms.notifications",
+        "vhost": "/",
+        "durable": true,
+        "auto_delete": false,
+        "arguments": {
+          "x-dead-letter-exchange": "notifications.dlx",
+          "x-dead-letter-routing-key": "sms.notifications.dead",
+          "x-max-length": 100000,
+          "x-message-ttl": 86400000
+        }
+      },
+      {
+        "name": "push.notifications",
+        "vhost": "/",
+        "durable": true,
+        "auto_delete": false,
+        "arguments": {
+          "x-dead-letter-exchange": "notifications.dlx",
+          "x-dead-letter-routing-key": "push.notifications.dead",
+          "x-max-length": 100000,
+          "x-message-ttl": 86400000
+        }
+      },
+      {
+        "name": "webhook.notifications.dead",
+        "vhost": "/",
+        "durable": true,
+        "auto_delete": false,
+        "arguments": {
+          "x-message-ttl": 604800000
+        }
+      },
+      {
+        "name": "email.notifications.dead",
+        "vhost": "/",
+        "durable": true,
+        "auto_delete": false,
+        "arguments": {
+          "x-message-ttl": 604800000
+        }
+      },
+      {
+        "name": "sms.notifications.dead",
+        "vhost": "/",
+        "durable": true,
+        "auto_delete": false,
+        "arguments": {
+          "x-message-ttl": 604800000
+        }
+      },
+      {
+        "name": "push.notifications.dead",
+        "vhost": "/",
+        "durable": true,
+        "auto_delete": false,
+        "arguments": {
+          "x-message-ttl": 604800000
+        }
+      }
+    ],
+    "exchanges": [
+      {
+        "name": "notifications",
+        "vhost": "/",
+        "type": "direct",
+        "durable": true,
+        "auto_delete": false,
+        "internal": false,
+        "arguments": {}
+      },
+      {
+        "name": "notifications.dlx",
+        "vhost": "/",
+        "type": "direct",
+        "durable": true,
+        "auto_delete": false,
+        "internal": false,
+        "arguments": {}
+      }
+    ],
+    "bindings": [
+      {
+        "source": "notifications",
+        "vhost": "/",
+        "destination": "webhook.notifications",
+        "destination_type": "queue",
+        "routing_key": "webhook.notifications",
+        "arguments": {}
+      },
+      {
+        "source": "notifications",
+        "vhost": "/",
+        "destination": "email.notifications",
+        "destination_type": "queue",
+        "routing_key": "email.notifications",
+        "arguments": {}
+      },
+      {
+        "source": "notifications",
+        "vhost": "/",
+        "destination": "sms.notifications",
+        "destination_type": "queue",
+        "routing_key": "sms.notifications",
+        "arguments": {}
+      },
+      {
+        "source": "notifications",
+        "vhost": "/",
+        "destination": "push.notifications",
+        "destination_type": "queue",
+        "routing_key": "push.notifications",
+        "arguments": {}
+      },
+      {
+        "source": "notifications.dlx",
+        "vhost": "/",
+        "destination": "webhook.notifications.dead",
+        "destination_type": "queue",
+        "routing_key": "webhook.notifications.dead",
+        "arguments": {}
+      },
+      {
+        "source": "notifications.dlx",
+        "vhost": "/",
+        "destination": "email.notifications.dead",
+        "destination_type": "queue",
+        "routing_key": "email.notifications.dead",
+        "arguments": {}
+      },
+      {
+        "source": "notifications.dlx",
+        "vhost": "/",
+        "destination": "sms.notifications.dead",
+        "destination_type": "queue",
+        "routing_key": "sms.notifications.dead",
+        "arguments": {}
+      },
+      {
+        "source": "notifications.dlx",
+        "vhost": "/",
+        "destination": "push.notifications.dead",
+        "destination_type": "queue",
+        "routing_key": "push.notifications.dead",
+        "arguments": {}
+      }
+    ]
+  }

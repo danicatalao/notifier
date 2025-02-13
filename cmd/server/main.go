@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/danicatalao/notifier/configs"
+	configs "github.com/danicatalao/notifier/configs/server"
 	"github.com/danicatalao/notifier/internal/forecast"
 	"github.com/danicatalao/notifier/internal/scheduled_notification"
 	"github.com/danicatalao/notifier/internal/user"
