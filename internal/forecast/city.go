@@ -5,7 +5,7 @@ type CityList struct {
 }
 
 type City struct {
-	ID    int    `xml:"id"`
+	Id    int    `xml:"id"`
 	Name  string `xml:"nome"`
 	State string `xml:"uf"`
 }

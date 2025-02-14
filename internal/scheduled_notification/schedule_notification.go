@@ -5,7 +5,7 @@ import "time"
 const SCHEDULED_NOTIFICATION_TABLE = "scheduled_notification"
 
 type ScheduledNotification struct {
-	ID               int64              `json:"id" db:"id"`
+	Id               int64              `json:"id" db:"id"`
 	Status           NotificationStatus `json:"status" db:"status"`
 	Date             time.Time          `json:"date" db:"date"`
 	CityName         string             `json:"city_name" db:"city_name"`

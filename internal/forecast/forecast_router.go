@@ -39,7 +39,7 @@ func (h *ForecastHandler) GetCityIDByName(c *gin.Context) {
 	}
 	fmt.Printf("%+v\n", city)
 	c.JSON(http.StatusOK, gin.H{
-		"CityID": city.ID,
+		"CityID": city.Id,
 	})
 }
 

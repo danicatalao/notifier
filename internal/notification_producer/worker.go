@@ -9,16 +9,15 @@ import (
 	l "github.com/danicatalao/notifier/internal/logger"
 	"github.com/danicatalao/notifier/internal/scheduled_notification"
 	sn "github.com/danicatalao/notifier/internal/scheduled_notification"
-	"github.com/danicatalao/notifier/pkg/database"
 	"github.com/danicatalao/notifier/pkg/rabbitmq"
 )
 
 type Worker struct {
-	databaseService *database.Service
-	rabbitService   rabbitmq.Service
-	pollInterval    time.Duration
-	batchSize       int
-	log             l.Logger
+	rabbitService rabbitmq.Service
+	repository    sn.ScheduledNotificationRepository
+	log           l.Logger
+	pollInterval  time.Duration
+	batchSize     uint64
 }
 
 type NotificationMessage struct {
@@ -26,12 +25,13 @@ type NotificationMessage struct {
 	UserId   int64
 }
 
-func NewWorker(db *database.Service, rs rabbitmq.Service, p time.Duration, b int, l l.Logger) *Worker {
+func NewWorker(rs rabbitmq.Service, r sn.ScheduledNotificationRepository, p time.Duration, b uint64, l l.Logger) *Worker {
 	return &Worker{
-		databaseService: db,
-		rabbitService:   rs,
-		pollInterval:    p,
-		batchSize:       b,
+		rabbitService: rs,
+		repository:    r,
+		pollInterval:  p,
+		batchSize:     b,
+		log:           l,
 	}
 }
 
@@ -64,21 +64,21 @@ func (w *Worker) Start(ctx context.Context) error {
 }
 
 func (w *Worker) processDueNotifications(ctx context.Context) error {
-	notifications, err := w.fetchDueNotifications(ctx)
+	notifications, err := w.repository.GetDueNotifications(ctx, w.batchSize)
 	if err != nil {
 		return fmt.Errorf("failed to fetch notifications: %v", err)
 	}
 
 	for _, notification := range notifications {
 		if err := w.publishNotification(ctx, notification); err != nil {
-			w.log.Error(ctx, "Failed to publish notification", "notification", notification.ID, "error", err.Error())
-			if err := w.updateNotificationStatus(ctx, notification.ID, scheduled_notification.StatusFailed); err != nil {
+			w.log.Error(ctx, "Failed to publish notification", "notification", notification.Id, "error", err.Error())
+			if err := w.repository.UpdateNotificationStatusWithTx(ctx, notification.Id, scheduled_notification.StatusFailed); err != nil {
 				w.log.Error(ctx, "Failed to update notification status: %v", err)
 			}
 			continue
 		}
 
-		if err := w.updateNotificationStatus(ctx, notification.ID, scheduled_notification.StatusSent); err != nil {
+		if err := w.repository.UpdateNotificationStatusWithTx(ctx, notification.Id, scheduled_notification.StatusSent); err != nil {
 			log.Printf("Failed to update notification status: %v", err)
 		}
 	}

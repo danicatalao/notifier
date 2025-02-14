@@ -22,7 +22,7 @@ func (s *forecast_service) GetForecastAndWave(cityName string) (*ForecastWave, e
 	if err != nil {
 		return nil, fmt.Errorf("error trying to get city name: %w", err)
 	}
-	cityId := strconv.Itoa(city.ID)
+	cityId := strconv.Itoa(city.Id)
 	fmt.Printf("%+v\n", city)
 
 	forecast, err := s.provider.GetCityForecast(cityId)

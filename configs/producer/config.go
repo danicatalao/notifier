@@ -28,11 +28,11 @@ type (
 
 	Worker struct {
 		PollInterval time.Duration `env:"POLL_INTERVAL"`
-		BatchSize    int           `env:"BATCH_SIZE"`
+		BatchSize    uint64        `env:"BATCH_SIZE"`
 	}
 )
 
-func NewConfig() (*Config, error) {
+func NewConfig(filepath string) (*Config, error) {
 	cfg := &Config{}
 	if err := cleanenv.ReadConfig(".env", cfg); err != nil {
 		return nil, err
