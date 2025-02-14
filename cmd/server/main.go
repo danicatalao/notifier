@@ -22,7 +22,7 @@ func main() {
 	log.Out = os.Stdout
 
 	// Loading .env variables into config
-	cfg, err := configs.NewConfig()
+	cfg, err := configs.NewConfig(".env")
 	if err != nil {
 		log.Fatalf("Config error: %s", err)
 	}

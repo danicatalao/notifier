@@ -21,7 +21,7 @@ func main() {
 	log := slog.Make(sloghuman.Sink(os.Stdout))
 
 	// Loading .env variables into config
-	cfg, err := configs.NewConfig("cmd/producer/.env")
+	cfg, err := configs.NewConfig(".env")
 	if err != nil {
 		log.Fatal(ctx, "Config error", "error", err)
 	}

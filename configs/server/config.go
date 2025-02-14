@@ -24,9 +24,9 @@ type (
 	}
 )
 
-func NewConfig() (*Config, error) {
+func NewConfig(filepath string) (*Config, error) {
 	cfg := &Config{}
-	if err := cleanenv.ReadConfig(".env", cfg); err != nil {
+	if err := cleanenv.ReadConfig(filepath, cfg); err != nil {
 		return nil, err
 	}
 	return cfg, nil
