@@ -3,6 +3,8 @@ package scheduled_notification
 import (
 	"context"
 	"fmt"
+
+	l "github.com/danicatalao/notifier/internal/logger"
 )
 
 type ScheduledNotificationService interface {
@@ -11,10 +13,11 @@ type ScheduledNotificationService interface {
 
 type schedule_notification_service struct {
 	repository ScheduledNotificationRepository
+	log        l.Logger
 }
 
-func NewScheduledNotificationService(r ScheduledNotificationRepository) *schedule_notification_service {
-	return &schedule_notification_service{repository: r}
+func NewScheduledNotificationService(r ScheduledNotificationRepository, l l.Logger) *schedule_notification_service {
+	return &schedule_notification_service{repository: r, log: l}
 }
 
 func (s *schedule_notification_service) CreateScheduledNotification(ctx context.Context, sn *ScheduledNotification) error {

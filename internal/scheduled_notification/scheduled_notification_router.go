@@ -4,15 +4,17 @@ import (
 	"fmt"
 	"net/http"
 
+	l "github.com/danicatalao/notifier/internal/logger"
 	"github.com/gin-gonic/gin"
 )
 
 type ScheduledNotificationHandler struct {
 	service ScheduledNotificationService
+	log     l.Logger
 }
 
-func NewScheduledNotificationHandler(s ScheduledNotificationService) *ScheduledNotificationHandler {
-	return &ScheduledNotificationHandler{service: s}
+func NewScheduledNotificationHandler(s ScheduledNotificationService, l l.Logger) *ScheduledNotificationHandler {
+	return &ScheduledNotificationHandler{service: s, log: l}
 }
 
 func (h *ScheduledNotificationHandler) AddNotificationRoutes(r *gin.RouterGroup) {

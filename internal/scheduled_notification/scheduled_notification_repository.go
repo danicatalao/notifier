@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
+	l "github.com/danicatalao/notifier/internal/logger"
 	"github.com/danicatalao/notifier/pkg/database"
 )
 
@@ -16,27 +17,27 @@ type ScheduledNotificationRepository interface {
 }
 
 type scheduled_notification_repository struct {
-	*database.Service
+	db  *database.Service
+	log l.Logger
 }
 
-func NewScheduledNotificationRepository(db *database.Service) *scheduled_notification_repository {
-	return &scheduled_notification_repository{db}
+func NewScheduledNotificationRepository(db *database.Service, l l.Logger) *scheduled_notification_repository {
+	return &scheduled_notification_repository{db: db, log: l}
 }
 
 func (r *scheduled_notification_repository) Create(ctx context.Context, sn *ScheduledNotification) error {
-	query, args, err := r.Builder.
+	query, args, err := r.db.Builder.
 		Insert(SCHEDULED_NOTIFICATION_TABLE).
 		Columns("date, city_name, user_id, notification_type").
 		Values(sn.Date, sn.CityName, sn.UserId, sn.NotificationType).
 		ToSql()
 
-	fmt.Printf("%s\n", query)
-
 	if err != nil {
 		return fmt.Errorf("could not build query: %w", err)
 	}
+	r.log.Info(ctx, "Executing sql statement", "sql", query, "args", args)
 
-	_, err = r.Pool.Exec(ctx, query, args...)
+	_, err = r.db.Pool.Exec(ctx, query, args...)
 	if err != nil {
 		return fmt.Errorf("insert failed: %w", err)
 	}
@@ -45,7 +46,7 @@ func (r *scheduled_notification_repository) Create(ctx context.Context, sn *Sche
 
 func (r *scheduled_notification_repository) GetDueNotifications(ctx context.Context, batchSize uint64) ([]ScheduledNotification, error) {
 	var notifications []ScheduledNotification
-	query, args, err := r.Builder.Select(
+	query, args, err := r.db.Builder.Select(
 		"id",
 		"status",
 		"date",
@@ -66,8 +67,9 @@ func (r *scheduled_notification_repository) GetDueNotifications(ctx context.Cont
 	if err != nil {
 		return nil, fmt.Errorf("could not build query: %w", err)
 	}
+	r.log.Info(ctx, "Executing sql statement", "sql", query, "args", args)
 
-	rows, err := r.Pool.Query(ctx, query, args...)
+	rows, err := r.db.Pool.Query(ctx, query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute query: %w", err)
 	}
@@ -99,13 +101,13 @@ func (r *scheduled_notification_repository) GetDueNotifications(ctx context.Cont
 }
 
 func (r *scheduled_notification_repository) UpdateNotificationStatusWithTx(ctx context.Context, id int64, status NotificationStatus) error {
-	tx, err := r.Pool.Begin(ctx)
+	tx, err := r.db.Pool.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %w", err)
 	}
 	defer tx.Rollback(ctx)
 
-	query, args, err := r.Builder.
+	query, args, err := r.db.Builder.
 		Update(SCHEDULED_NOTIFICATION_TABLE).
 		Set("status", status).
 		Where(squirrel.Eq{"id": id}).

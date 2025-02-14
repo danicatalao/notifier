@@ -46,7 +46,7 @@ func main() {
 	defer db.Close()
 	log.Info(ctx, "Connection pool created on Postgres")
 
-	scheduledNotificationRepository := scheduled_notification.NewScheduledNotificationRepository(db)
+	scheduledNotificationRepository := scheduled_notification.NewScheduledNotificationRepository(db, log)
 
 	worker := notification_producer.NewWorker(messageBroker, scheduledNotificationRepository, cfg.PollInterval, cfg.BatchSize, log)
 
