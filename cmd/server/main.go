@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	"cdr.dev/slog"
-	"cdr.dev/slog/sloggers/sloghuman"
+	"log/slog"
+
 	configs "github.com/danicatalao/notifier/configs/server"
 	"github.com/danicatalao/notifier/internal/forecast"
 	"github.com/danicatalao/notifier/internal/scheduled_notification"
@@ -21,22 +21,27 @@ import (
 func main() {
 	ctx := context.Background()
 
-	log := slog.Make(sloghuman.Sink(os.Stdout))
+	//log := slog.Make(sloghuman.Sink(os.Stdout))
+	handler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+	})
+	log := slog.New(handler)
+	slog.SetDefault(log)
 
 	// Loading .env variables into config
 	cfg, err := configs.NewConfig(".env")
 	if err != nil {
-		log.Fatal(ctx, "Config error", "error", err)
+		log.ErrorContext(ctx, "Config error", "error", err)
 	}
 	fmt.Printf("%+v\n", cfg)
 
 	db, err := postgres.New(cfg.PG.Url, cfg.PG.ConnAttempts, cfg.PG.ConnTimeoutMs)
 	if err != nil {
-		log.Fatal(ctx, "could not create connection pool on Postgres", "error", err)
+		log.ErrorContext(ctx, "could not create connection pool on Postgres", "error", err)
 		os.Exit(1)
 	}
 	defer db.Close()
-	log.Info(ctx, "Connection pool created on Postgres")
+	log.InfoContext(ctx, "Connection pool created on Postgres")
 
 	httpClient := &http.Client{Timeout: 10 * time.Second}
 

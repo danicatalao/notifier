@@ -3,8 +3,8 @@ package logger
 import "context"
 
 type Logger interface {
-	Info(ctx context.Context, msg string, fields ...any)
-	Error(ctx context.Context, msg string, fields ...any)
-	Debug(ctx context.Context, msg string, fields ...any)
-	Warn(ctx context.Context, msg string, fields ...any)
+	InfoContext(ctx context.Context, msg string, fields ...any)
+	ErrorContext(ctx context.Context, msg string, fields ...any)
+	DebugContext(ctx context.Context, msg string, fields ...any)
+	WarnContext(ctx context.Context, msg string, fields ...any)
 }

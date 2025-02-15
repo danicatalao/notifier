@@ -35,7 +35,7 @@ func (r *scheduled_notification_repository) Create(ctx context.Context, sn *Sche
 	if err != nil {
 		return fmt.Errorf("could not build query: %w", err)
 	}
-	r.log.Debug(ctx, "Executing sql statement", "sql", query, "args", args)
+	r.log.DebugContext(ctx, "Executing sql statement", "sql", query, "args", args)
 
 	_, err = r.db.Pool.Exec(ctx, query, args...)
 	if err != nil {
@@ -67,7 +67,7 @@ func (r *scheduled_notification_repository) GetDueNotifications(ctx context.Cont
 	if err != nil {
 		return nil, fmt.Errorf("could not build query: %w", err)
 	}
-	r.log.Debug(ctx, "Executing sql statement", "sql", query, "args", args)
+	r.log.DebugContext(ctx, "Executing sql statement", "sql", query, "args", args)
 
 	rows, err := r.db.Pool.Query(ctx, query, args...)
 	if err != nil {

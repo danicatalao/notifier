@@ -33,7 +33,7 @@ func NewForecastApiClient(c HttpClient, s string, l l.Logger) ForecastApiClient 
 func (c *ForecastApiClient) GetCity(ctx context.Context, name string) (*City, error) {
 	url := fmt.Sprintf("%s/listaCidades?city=%s", c.baseUrl, name)
 
-	c.log.Info(ctx, "Searching City Id", "cityId", name)
+	c.log.InfoContext(ctx, "Searching City Id", "cityId", name)
 
 	resp, err := c.httpClient.Get(url)
 	if err != nil {
@@ -64,7 +64,7 @@ func (c *ForecastApiClient) GetCity(ctx context.Context, name string) (*City, er
 
 func (c *ForecastApiClient) GetCityForecast(ctx context.Context, cityID string) (*Forecast, error) {
 	url := fmt.Sprintf("%s/cidade/%s/previsao.xml", c.baseUrl, cityID)
-	c.log.Info(ctx, "Getting weather forecast", "cityId", cityID)
+	c.log.InfoContext(ctx, "Getting weather forecast", "cityId", cityID)
 
 	resp, err := c.httpClient.Get(url)
 	if err != nil {
@@ -96,7 +96,7 @@ func (c *ForecastApiClient) GetCityForecast(ctx context.Context, cityID string) 
 func (c *ForecastApiClient) GetWaveForecast(ctx context.Context, cityID string, day string) (*WaveForecast, error) {
 	url := fmt.Sprintf("%s/cidade/%s/dia/%s/ondas.xml", c.baseUrl, cityID, day)
 
-	c.log.Info(ctx, "Getting wave forecast", "cityId", cityID)
+	c.log.InfoContext(ctx, "Getting wave forecast", "cityId", cityID)
 
 	resp, err := c.httpClient.Get(url)
 	if err != nil {

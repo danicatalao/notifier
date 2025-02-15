@@ -43,7 +43,7 @@ func (w *Worker) publishNotification(ctx context.Context, n sn.ScheduledNotifica
 		Body:       &NotificationMessage{n.CityName, n.UserId},
 	}
 
-	w.log.Info(ctx, "Queuing notification", "message", msg)
+	w.log.InfoContext(ctx, "Queuing notification", "message", msg)
 	return w.rabbitService.Publish(ctx, msg)
 }
 
@@ -56,7 +56,7 @@ func (w *Worker) Start(ctx context.Context) error {
 		case <-ctx.Done():
 			return ctx.Err()
 		case <-ticker.C:
-			w.log.Debug(ctx, "Worker tick")
+			w.log.DebugContext(ctx, "Worker tick")
 			if err := w.processDueNotifications(ctx); err != nil {
 				log.Printf("Error processing notifications: %v", err)
 			}
@@ -65,7 +65,7 @@ func (w *Worker) Start(ctx context.Context) error {
 }
 
 func (w *Worker) processDueNotifications(ctx context.Context) error {
-	w.log.Info(ctx, "Fetching due notifications")
+	w.log.InfoContext(ctx, "Fetching due notifications")
 	notifications, err := w.repository.GetDueNotifications(ctx, w.batchSize)
 	if err != nil {
 		return fmt.Errorf("failed to fetch notifications: %v", err)
@@ -73,9 +73,9 @@ func (w *Worker) processDueNotifications(ctx context.Context) error {
 
 	for _, notification := range notifications {
 		if err := w.publishNotification(ctx, notification); err != nil {
-			w.log.Error(ctx, "Failed to publish notification", "notification", notification.Id, "error", err.Error())
+			w.log.ErrorContext(ctx, "Failed to publish notification", "notification", notification.Id, "error", err.Error())
 			if err := w.repository.UpdateNotificationStatusWithTx(ctx, notification.Id, scheduled_notification.StatusFailed); err != nil {
-				w.log.Error(ctx, "Failed to update notification status: %v", err)
+				w.log.ErrorContext(ctx, "Failed to update notification status: %v", err)
 			}
 			continue
 		}
