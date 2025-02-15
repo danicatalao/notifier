@@ -1,9 +1,9 @@
 package forecast
 
 import (
-	"fmt"
 	"net/http"
 
+	l "github.com/danicatalao/notifier/internal/logger"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,10 +12,11 @@ import (
 type ForecastHandler struct {
 	client  ForecastApiClient
 	service ForecastService
+	log     l.Logger
 }
 
-func NewForecastHandler(c ForecastApiClient, s ForecastService) *ForecastHandler {
-	return &ForecastHandler{client: c, service: s}
+func NewForecastHandler(c ForecastApiClient, s ForecastService, l l.Logger) *ForecastHandler {
+	return &ForecastHandler{client: c, service: s, log: l}
 }
 
 func (h *ForecastHandler) AddForecastRoutes(r *gin.RouterGroup) {
@@ -32,12 +33,12 @@ func (h *ForecastHandler) AddForecastRoutes(r *gin.RouterGroup) {
 func (h *ForecastHandler) GetCityIDByName(c *gin.Context) {
 	cityName := c.Query("name")
 
-	city, err := h.client.GetCity(cityName)
+	city, err := h.client.GetCity(c, cityName)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	fmt.Printf("%+v\n", city)
+
 	c.JSON(http.StatusOK, gin.H{
 		"CityID": city.Id,
 	})
@@ -46,7 +47,7 @@ func (h *ForecastHandler) GetCityIDByName(c *gin.Context) {
 func (h *ForecastHandler) GetForecast(c *gin.Context) {
 	cityId := c.Param("id")
 
-	forecast, err := h.client.GetCityForecast(cityId)
+	forecast, err := h.client.GetCityForecast(c, cityId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -59,7 +60,7 @@ func (h *ForecastHandler) GetWaves(c *gin.Context) {
 	cityId := c.Param("id")
 	day := c.Param("day")
 
-	wave, err := h.client.GetWaveForecast(cityId, day)
+	wave, err := h.client.GetWaveForecast(c, cityId, day)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -71,7 +72,7 @@ func (h *ForecastHandler) GetWaves(c *gin.Context) {
 func (h *ForecastHandler) GetForeCastAndWave(c *gin.Context) {
 	cityName := c.Param("cityName")
 
-	forecastWave, err := h.service.GetForecastAndWave(cityName)
+	forecastWave, err := h.service.GetForecastAndWave(c, cityName)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

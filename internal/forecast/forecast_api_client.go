@@ -2,11 +2,13 @@ package forecast
 
 import (
 	"bytes"
+	"context"
 	"encoding/xml"
 	"fmt"
 	"io"
 	"net/http"
 
+	l "github.com/danicatalao/notifier/internal/logger"
 	"golang.org/x/net/html/charset"
 )
 
@@ -17,17 +19,21 @@ type HttpClient interface {
 type ForecastApiClient struct {
 	httpClient HttpClient
 	baseUrl    string
+	log        l.Logger
 }
 
-func NewForecastApiClient(c HttpClient, s string) ForecastApiClient {
+func NewForecastApiClient(c HttpClient, s string, l l.Logger) ForecastApiClient {
 	return ForecastApiClient{
 		httpClient: c,
 		baseUrl:    s,
+		log:        l,
 	}
 }
 
-func (c *ForecastApiClient) GetCity(name string) (*City, error) {
+func (c *ForecastApiClient) GetCity(ctx context.Context, name string) (*City, error) {
 	url := fmt.Sprintf("%s/listaCidades?city=%s", c.baseUrl, name)
+
+	c.log.Info(ctx, "Searching City Id", "cityId", name)
 
 	resp, err := c.httpClient.Get(url)
 	if err != nil {
@@ -56,8 +62,9 @@ func (c *ForecastApiClient) GetCity(name string) (*City, error) {
 	return &cityList.Cities[0], nil
 }
 
-func (c *ForecastApiClient) GetCityForecast(cityID string) (*Forecast, error) {
+func (c *ForecastApiClient) GetCityForecast(ctx context.Context, cityID string) (*Forecast, error) {
 	url := fmt.Sprintf("%s/cidade/%s/previsao.xml", c.baseUrl, cityID)
+	c.log.Info(ctx, "Getting weather forecast", "cityId", cityID)
 
 	resp, err := c.httpClient.Get(url)
 	if err != nil {
@@ -86,8 +93,10 @@ func (c *ForecastApiClient) GetCityForecast(cityID string) (*Forecast, error) {
 	return &forecast, nil
 }
 
-func (c *ForecastApiClient) GetWaveForecast(cityID string, day string) (*WaveForecast, error) {
+func (c *ForecastApiClient) GetWaveForecast(ctx context.Context, cityID string, day string) (*WaveForecast, error) {
 	url := fmt.Sprintf("%s/cidade/%s/dia/%s/ondas.xml", c.baseUrl, cityID, day)
+
+	c.log.Info(ctx, "Getting wave forecast", "cityId", cityID)
 
 	resp, err := c.httpClient.Get(url)
 	if err != nil {

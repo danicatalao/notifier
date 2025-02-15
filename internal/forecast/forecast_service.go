@@ -1,41 +1,44 @@
 package forecast
 
 import (
+	"context"
 	"fmt"
 	"strconv"
+
+	l "github.com/danicatalao/notifier/internal/logger"
 )
 
 type ForecastService interface {
-	GetForecastAndWave(cityName string) (*ForecastWave, error)
+	GetForecastAndWave(ctx context.Context, cityName string) (*ForecastWave, error)
 }
 
 type forecast_service struct {
 	provider ForecastApiClient
+	log      l.Logger
 }
 
-func NewForecastService(p ForecastApiClient) *forecast_service {
-	return &forecast_service{provider: p}
+func NewForecastService(p ForecastApiClient, l l.Logger) *forecast_service {
+	return &forecast_service{provider: p, log: l}
 }
 
-func (s *forecast_service) GetForecastAndWave(cityName string) (*ForecastWave, error) {
-	city, err := s.provider.GetCity(cityName)
+func (s *forecast_service) GetForecastAndWave(ctx context.Context, cityName string) (*ForecastWave, error) {
+	city, err := s.provider.GetCity(ctx, cityName)
 	if err != nil {
 		return nil, fmt.Errorf("error trying to get city name: %w", err)
 	}
 	cityId := strconv.Itoa(city.Id)
-	fmt.Printf("%+v\n", city)
 
-	forecast, err := s.provider.GetCityForecast(cityId)
+	s.log.Info(ctx, "Getting weather and wave forecast", "cityId", cityName)
+
+	forecast, err := s.provider.GetCityForecast(ctx, cityId)
 	if err != nil {
 		return nil, fmt.Errorf("error trying to get city forecast: %w", err)
 	}
-	fmt.Printf("%+v\n", forecast)
 
-	wave, err := s.provider.GetWaveForecast(cityId, "0")
+	wave, err := s.provider.GetWaveForecast(ctx, cityId, "0")
 	if err != nil {
 		return nil, fmt.Errorf("error trying to get city wave forecast: %w", err)
 	}
-	fmt.Printf("%+v\n", wave)
 
 	var waveReturn *WaveForecast
 	forecastReturn := forecast
@@ -43,9 +46,6 @@ func (s *forecast_service) GetForecastAndWave(cityName string) (*ForecastWave, e
 	if wave.Name != "undefined" {
 		waveReturn = wave
 	}
-
-	fmt.Printf("%+v\n", waveReturn)
-	fmt.Printf("%+v\n", forecastReturn)
 
 	return &ForecastWave{Forecast: forecastReturn, Wave: waveReturn}, nil
 }

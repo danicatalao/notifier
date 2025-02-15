@@ -10,7 +10,7 @@ type (
 	}
 
 	PG struct {
-		URL           string `env:"URL"`
+		Url           string `env:"URL"`
 		ConnAttempts  int    `env:"CONN_ATTEMPTS"`
 		ConnTimeoutMs int    `env:"CONN_TIMEOUT_MS"`
 	}
@@ -20,7 +20,7 @@ type (
 	}
 
 	FORECAST_PROVIDER struct {
-		URL string `env:"URL"`
+		Url string `env:"URL"`
 	}
 )
 
