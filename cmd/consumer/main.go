@@ -3,27 +3,31 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"time"
 
 	"log/slog"
 
-	configs "github.com/danicatalao/notifier/configs/producer"
-	"github.com/danicatalao/notifier/internal/notification_producer"
-	"github.com/danicatalao/notifier/internal/scheduled_notification"
+	configs "github.com/danicatalao/notifier/configs/consumer"
+	"github.com/danicatalao/notifier/internal/forecast"
+	"github.com/danicatalao/notifier/internal/notification_consumer"
+	"github.com/danicatalao/notifier/internal/user"
 	postgres "github.com/danicatalao/notifier/pkg/database"
 	"github.com/danicatalao/notifier/pkg/rabbitmq"
+	"github.com/lmittmann/tint"
 )
 
 func main() {
 	ctx := context.Background()
 
-	//log := slog.Make(sloghuman.Sink(os.Stdout))
-	handler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelDebug,
-	})
-	log := slog.New(handler)
-	slog.SetDefault(log)
+	log := slog.New(tint.NewHandler(os.Stderr, nil))
+	slog.SetDefault(slog.New(
+		tint.NewHandler(os.Stderr, &tint.Options{
+			Level:      slog.LevelDebug,
+			TimeFormat: time.DateTime,
+		}),
+	))
 
 	// Loading .env variables into config
 	cfg, err := configs.NewConfig(".env")
@@ -35,6 +39,7 @@ func main() {
 	messageBroker, err := rabbitmq.NewService(rabbitmq.Config{
 		Url:            cfg.Rabbitmq.Url,
 		ExchangeName:   cfg.Rabbitmq.ExchangeName,
+		ExchangeType:   cfg.ExchangeType,
 		ReconnectDelay: cfg.Rabbitmq.ReconnectDelay * time.Second,
 		MaxRetries:     cfg.Rabbitmq.MaxRetries,
 	}, log)
@@ -52,11 +57,22 @@ func main() {
 	defer db.Close()
 	log.InfoContext(ctx, "Connection pool created on Postgres")
 
-	scheduledNotificationRepository := scheduled_notification.NewScheduledNotificationRepository(db, log)
+	httpClient := &http.Client{Timeout: 10 * time.Second}
 
-	worker := notification_producer.NewWorker(messageBroker, scheduledNotificationRepository, cfg.PollInterval, cfg.BatchSize, log)
+	forecastApiClient := forecast.NewForecastApiClient(httpClient, cfg.ForecastProvider.Url, log)
+	forecastService := forecast.NewForecastService(forecastApiClient, log)
+
+	userRepository := user.NewUserRepository(db)
+	userService := user.NewUserService(userRepository)
+
+	worker, err := notification_consumer.NewWorker(messageBroker, userService, forecastService, log, cfg.Queue.Name)
+	if err != nil {
+		log.ErrorContext(ctx, "Could not create worker", "error", err)
+		os.Exit(1)
+	}
 
 	if err := worker.Start(ctx); err != nil {
-		log.ErrorContext(ctx, "failed to start producer worker", "error", err)
+		log.ErrorContext(ctx, "failed to start consumer worker", "error", err)
+		os.Exit(1)
 	}
 }

@@ -25,9 +25,10 @@ type Message struct {
 }
 
 type DeliveryMessage struct {
-	Body []byte
-	Ack  func(multiple bool) error
-	Nack func(multiple bool, requeue bool) error
+	RoutingKey string
+	Body       []byte
+	Ack        func(multiple bool) error
+	Nack       func(multiple bool, requeue bool) error
 }
 
 type Service interface {
@@ -79,20 +80,20 @@ func (s *service) connect() error {
 		return fmt.Errorf("failed to open channel: %v", err)
 	}
 
-	err = ch.ExchangeDeclare(
-		s.config.ExchangeName,
-		s.config.ExchangeType,
-		true,  // durable
-		false, // auto-delete
-		false, // internal
-		false, // no-wait
-		nil,   // arguments
-	)
-	if err != nil {
-		ch.Close()
-		conn.Close()
-		return fmt.Errorf("failed to declare exchange: %v", err)
-	}
+	// err = ch.ExchangeDeclare(
+	// 	s.config.ExchangeName,
+	// 	s.config.ExchangeType,
+	// 	true,  // durable
+	// 	false, // auto-delete
+	// 	false, // internal
+	// 	false, // no-wait
+	// 	nil,   // arguments
+	// )
+	// if err != nil {
+	// 	ch.Close()
+	// 	conn.Close()
+	// 	return fmt.Errorf("failed to declare exchange: %v", err)
+	// }
 
 	s.mu.Lock()
 	s.conn = conn
@@ -197,34 +198,36 @@ func (s *service) Consume(ctx context.Context, queueName string) (<-chan Deliver
 		return nil, fmt.Errorf("service is closed")
 	}
 
-	// Declare queue if it doesn't exist
-	q, err := s.ch.QueueDeclare(
-		queueName,
-		true,  // durable
-		false, // autoDelete
-		false, // exclusive
-		false, // noWait
-		nil,   // args
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to declare queue: %v", err)
-	}
+	// // Declare queue if it doesn't exist
+	// args := make(map[string]interface{})
+	// args["x-message-ttl"] = int64(86400000)
+	// q, err := s.ch.QueueDeclare(
+	// 	queueName,
+	// 	true,  // durable
+	// 	false, // autoDelete
+	// 	false, // exclusive
+	// 	false, // noWait
+	// 	args,  // args
+	// )
+	// if err != nil {
+	// 	return nil, fmt.Errorf("failed to declare queue: %v", err)
+	// }
 
-	// Bind queue to exchange
-	err = s.ch.QueueBind(
-		q.Name,
-		q.Name, // Using queue name as routing key
-		s.config.ExchangeName,
-		false, // noWait
-		nil,   // args
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to bind queue: %v", err)
-	}
+	// // Bind queue to exchange
+	// err = s.ch.QueueBind(
+	// 	q.Name,
+	// 	q.Name, // Using queue name as routing key
+	// 	s.config.ExchangeName,
+	// 	false, // noWait
+	// 	nil,   // args
+	// )
+	// if err != nil {
+	// 	return nil, fmt.Errorf("failed to bind queue: %v", err)
+	// }
 
 	// Start consuming
 	deliveries, err := s.ch.Consume(
-		q.Name,
+		queueName,
 		"",    // consumer tag
 		false, // autoAck
 		false, // exclusive
@@ -256,7 +259,8 @@ func (s *service) Consume(ctx context.Context, queueName string) (<-chan Deliver
 
 				// Convert amqp.Delivery to DeliveryMessage
 				deliveryChan <- DeliveryMessage{
-					Body: d.Body,
+					RoutingKey: d.RoutingKey,
+					Body:       d.Body,
 					Ack: func(multiple bool) error {
 						return d.Ack(multiple)
 					},

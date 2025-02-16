@@ -8,12 +8,13 @@ import (
 
 type (
 	Config struct {
-		PG                `env-prefix:"PG_" env-required:"true"`
-		FORECAST_PROVIDER `env-prefix:"FORECAST_PROVIDER_" env-required:"true"`
-		Rabbitmq          `env-prefix:"RABBITMQ_" env-required:"true"`
+		Pg               `env-prefix:"PG_" env-required:"true"`
+		ForecastProvider `env-prefix:"FORECAST_PROVIDER_" env-required:"true"`
+		Rabbitmq         `env-prefix:"RABBITMQ_" env-required:"true"`
+		Queue            `env-prefix:"QUEUE_" env-required:"true"`
 	}
 
-	PG struct {
+	Pg struct {
 		Url           string `env:"URL"`
 		ConnAttempts  int    `env:"CONN_ATTEMPTS"`
 		ConnTimeoutMs int    `env:"CONN_TIMEOUT_MS"`
@@ -27,8 +28,12 @@ type (
 		ReconnectDelay time.Duration `env:"RECONNECT_DELAY"`
 	}
 
-	FORECAST_PROVIDER struct {
+	ForecastProvider struct {
 		Url string `env:"URL"`
+	}
+
+	Queue struct {
+		Name string `env:"NAME"`
 	}
 )
 

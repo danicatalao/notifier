@@ -16,17 +16,19 @@ import (
 	"github.com/danicatalao/notifier/internal/user"
 	postgres "github.com/danicatalao/notifier/pkg/database"
 	"github.com/gin-gonic/gin"
+	"github.com/lmittmann/tint"
 )
 
 func main() {
 	ctx := context.Background()
 
-	//log := slog.Make(sloghuman.Sink(os.Stdout))
-	handler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelDebug,
-	})
-	log := slog.New(handler)
-	slog.SetDefault(log)
+	log := slog.New(tint.NewHandler(os.Stderr, nil))
+	slog.SetDefault(slog.New(
+		tint.NewHandler(os.Stderr, &tint.Options{
+			Level:      slog.LevelDebug,
+			TimeFormat: time.DateTime,
+		}),
+	))
 
 	// Loading .env variables into config
 	cfg, err := configs.NewConfig(".env")
