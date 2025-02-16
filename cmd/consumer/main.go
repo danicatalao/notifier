@@ -41,11 +41,12 @@ func main() {
 		Url:            cfg.Rabbitmq.Url,
 		ExchangeName:   cfg.Rabbitmq.ExchangeName,
 		ExchangeType:   cfg.ExchangeType,
-		ReconnectDelay: cfg.Rabbitmq.ReconnectDelay * time.Second,
+		ReconnectDelay: cfg.Rabbitmq.ReconnectDelay,
 		MaxRetries:     cfg.Rabbitmq.MaxRetries,
 	}, log)
 	if err != nil {
 		log.ErrorContext(ctx, "failed to create RabbitMQ service", "error", err)
+		os.Exit(1)
 	}
 	defer messageBroker.Close()
 	log.InfoContext(ctx, "Connection established with RabbitMQ")

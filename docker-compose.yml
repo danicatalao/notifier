@@ -38,6 +38,43 @@ services:
       - RABBITMQ_LOAD_DEFINITIONS=true
     restart: unless-stopped
 
+  server:
+    build:
+      context: .
+      dockerfile: server.Dockerfile
+    container_name: server
+    image: server
+    env_file:
+    - ./cmd/server/.env
+    ports:
+      - 8081:8081
+    depends_on:
+      - db
+
+  producer:
+    build:
+      context: .
+      dockerfile: producer.Dockerfile
+    container_name: producer
+    image: producer
+    env_file:
+    - ./cmd/producer/.env
+    depends_on:
+      - db
+      - rabbitmq
+
+  consumer:
+    build:
+      context: .
+      dockerfile: consumer.Dockerfile
+    container_name: consumer
+    image: consumer
+    env_file:
+    - ./cmd/consumer/.env
+    depends_on:
+      - db
+      - rabbitmq
+
 volumes:
   pg-data:
   rabbitmq_data:

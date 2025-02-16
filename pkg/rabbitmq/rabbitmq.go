@@ -59,11 +59,28 @@ func NewService(config Config, l l.Logger) (*service, error) {
 		log:    l,
 	}
 
-	if err := s.connect(); err != nil {
-		return nil, err
+	var connected bool
+	for i := 0; i < config.MaxRetries; i++ {
+		if err := s.connect(); err == nil {
+			connected = true
+			break
+		}
+		l.ErrorContext(context.Background(), "Failed to connect to RabbitMQ",
+			"retry attempt", i+1,
+			"max attempts", config.MaxRetries,
+			"retry delay", config.ReconnectDelay)
+		time.Sleep(config.ReconnectDelay)
 	}
 
-	go s.monitorConnection()
+	if !connected {
+		return nil, fmt.Errorf("failed to connect to RabbitMQ after %d attempts", config.MaxRetries)
+	}
+
+	// if err := s.connect(); err != nil {
+	// 	return nil, err
+	// }
+
+	//go s.monitorConnection()
 
 	return s, nil
 }

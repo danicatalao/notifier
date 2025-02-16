@@ -28,7 +28,7 @@ func (s *forecast_service) GetForecastAndWave(ctx context.Context, cityName stri
 	}
 	cityId := strconv.Itoa(city.Id)
 
-	s.log.InfoContext(ctx, "Getting weather and wave forecast", "cityId", cityName)
+	s.log.InfoContext(ctx, "Getting weather and wave forecast", "city", cityName)
 
 	forecast, err := s.provider.GetCityForecast(ctx, cityId)
 	if err != nil {

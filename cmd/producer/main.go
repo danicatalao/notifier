@@ -42,7 +42,7 @@ func main() {
 	messageBroker, err := rabbitmq.NewService(rabbitmq.Config{
 		Url:            cfg.Rabbitmq.Url,
 		ExchangeName:   cfg.Rabbitmq.ExchangeName,
-		ReconnectDelay: cfg.Rabbitmq.ReconnectDelay * time.Second,
+		ReconnectDelay: cfg.Rabbitmq.ReconnectDelay,
 		MaxRetries:     cfg.Rabbitmq.MaxRetries,
 	}, log)
 	if err != nil {

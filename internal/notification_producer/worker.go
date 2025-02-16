@@ -58,7 +58,7 @@ func (w *Worker) Start(ctx context.Context) error {
 		case <-ticker.C:
 			w.log.DebugContext(ctx, "Worker tick")
 			if err := w.processDueNotifications(ctx); err != nil {
-				log.Printf("Error processing notifications: %v", err)
+				w.log.ErrorContext(ctx, "Error processing notification", "error", err)
 			}
 		}
 	}
