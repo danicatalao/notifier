@@ -35,7 +35,7 @@ func (r *user_repository) Create(ctx context.Context, u *AppUser) (int64, error)
 	r.log.DebugContext(ctx, "Executing sql statement", "sql", query, "args", args)
 
 	if err != nil {
-		return -1, fmt.Errorf("user repository - adduser - could not build query: %w", err)
+		return -1, fmt.Errorf("could not build query: %w", err)
 	}
 
 	var id int64

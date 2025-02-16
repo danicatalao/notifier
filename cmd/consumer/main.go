@@ -65,7 +65,7 @@ func main() {
 	userRepository := user.NewUserRepository(db, log)
 	userService := user.NewUserService(userRepository)
 
-	worker, err := notification_consumer.NewWorker(messageBroker, userService, forecastService, log, cfg.Queue.Name)
+	worker, err := notification_consumer.NewWorker(messageBroker, userService, forecastService, log, cfg.Queue.Name, httpClient)
 	if err != nil {
 		log.ErrorContext(ctx, "Could not create worker", "error", err)
 		os.Exit(1)

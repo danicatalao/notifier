@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	l "github.com/danicatalao/notifier/internal/logger"
 	"golang.org/x/net/html/charset"
@@ -31,9 +32,9 @@ func NewForecastApiClient(c HttpClient, s string, l l.Logger) ForecastApiClient 
 }
 
 func (c *ForecastApiClient) GetCity(ctx context.Context, name string) (*City, error) {
-	url := fmt.Sprintf("%s/listaCidades?city=%s", c.baseUrl, name)
+	url := fmt.Sprintf("%s/listaCidades?city=%s", c.baseUrl, strings.Replace(name, " ", "+", -1))
 
-	c.log.InfoContext(ctx, "Searching City Id", "cityId", name)
+	c.log.InfoContext(ctx, "Searching City", "cityName", name)
 
 	resp, err := c.httpClient.Get(url)
 	if err != nil {
@@ -57,6 +58,9 @@ func (c *ForecastApiClient) GetCity(ctx context.Context, name string) (*City, er
 	err = decoder.Decode(&cityList)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse XML: %w", err)
+	}
+	if len(cityList.Cities) == 0 {
+		return nil, fmt.Errorf("City not found for name: %s", name)
 	}
 
 	return &cityList.Cities[0], nil

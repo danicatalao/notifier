@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 
 	"github.com/danicatalao/notifier/internal/forecast"
 	l "github.com/danicatalao/notifier/internal/logger"
@@ -17,6 +19,10 @@ type NotificationMessage struct {
 	UserId   int64
 }
 
+type HttpClient interface {
+	Post(url string, contentType string, body io.Reader) (resp *http.Response, err error)
+}
+
 type Worker struct {
 	rabbitService       rabbitmq.Service
 	userService         user.UserService
@@ -26,13 +32,13 @@ type Worker struct {
 	queueName           string
 }
 
-func NewWorker(r rabbitmq.Service, u user.UserService, f forecast.ForecastService, l l.Logger, queue string) (*Worker, error) {
+func NewWorker(r rabbitmq.Service, u user.UserService, f forecast.ForecastService, l l.Logger, queue string, h HttpClient) (*Worker, error) {
 	var n notification.NotificationService
 
 	if queue == "webhook.notifications" {
-		n = notification.NewWebhookService(u, f, l)
+		n = notification.NewWebhookService(u, f, l, h)
 	} else {
-		return nil, fmt.Errorf("Notification type %s not supported", queue)
+		return nil, fmt.Errorf("notification type %s not supported", queue)
 	}
 
 	return &Worker{
