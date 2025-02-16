@@ -1,4 +1,6 @@
 # Notifier
+![Go](https://img.shields.io/badge/go-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white) ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white) ![RabbitMQ](https://img.shields.io/badge/Rabbitmq-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white) ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
+
 
 O Notifier é um sistema de notificações com informações de clima e tempo obtidas do CPTEC (Centro de Previsão de Tempo e Estudos Climáticos). O sistema possui recursos de criação de usuário, opt-out de usuário (não permite mais recebimento de notificação) e notificações agendadas ou "o mais breve possível". A notificação é a previsão do tempo para determinada cidade para os próximos 4 dias e a previsão de ondas do dia atual caso seja uma cidade litorânea. Atualmente é suportado apenas um tipo de notificação: webhook (rota de uma aplicação web).
 
@@ -24,7 +26,7 @@ Banco de dados PostgreSQL que armazena dados de usuários e notificações.
 Brooker RabbitMQ com a Exchange notifications e filas conectadas para cada tipo de notificação: webhook.notifications, email.notifications, sms.notifications e push.notifications.
 
 - API Externa de previsão do tempo  
-API do CPTEC cujas recursos são utilizados: listaCidade para obter identificador da cidade, previsao para obter previsão do tempo para 4 dias e ondas para obter previsão de ondas. Referência: http://servicos.cptec.inpe.br/XML/
+API do CPTEC cujas recursos são utilizados: **listaCidade** para obter identificador da cidade, **previsao** para obter previsão do tempo para 4 dias e **ondas** para obter previsão de ondas. Referência: http://servicos.cptec.inpe.br/XML/
 
 ## 🛠️ Setup
 
