@@ -7,12 +7,14 @@ import (
 	"sync"
 	"time"
 
+	l "github.com/danicatalao/notifier/internal/logger"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type Config struct {
 	Url            string
 	ExchangeName   string
+	ExchangeType   string
 	ReconnectDelay time.Duration
 	MaxRetries     int
 }
@@ -22,8 +24,15 @@ type Message struct {
 	Body       interface{}
 }
 
+type DeliveryMessage struct {
+	Body []byte
+	Ack  func(multiple bool) error
+	Nack func(multiple bool, requeue bool) error
+}
+
 type Service interface {
 	Publish(ctx context.Context, msg Message) error
+	Consume(ctx context.Context, queueName string) (<-chan DeliveryMessage, error)
 	Close() error
 }
 
@@ -33,9 +42,10 @@ type service struct {
 	ch     *amqp.Channel
 	mu     sync.RWMutex
 	closed bool
+	log    l.Logger
 }
 
-func NewService(config Config) (Service, error) {
+func NewService(config Config, l l.Logger) (*service, error) {
 	if config.ReconnectDelay == 0 {
 		config.ReconnectDelay = 5 * time.Second
 	}
@@ -45,6 +55,7 @@ func NewService(config Config) (Service, error) {
 
 	s := &service{
 		config: config,
+		log:    l,
 	}
 
 	if err := s.connect(); err != nil {
@@ -70,7 +81,7 @@ func (s *service) connect() error {
 
 	err = ch.ExchangeDeclare(
 		s.config.ExchangeName,
-		"direct",
+		s.config.ExchangeType,
 		true,  // durable
 		false, // auto-delete
 		false, // internal
@@ -148,7 +159,6 @@ func (s *service) Publish(ctx context.Context, msg Message) error {
 	return nil
 }
 
-// Close cleanly shuts down the service
 func (s *service) Close() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -177,4 +187,86 @@ func (s *service) Close() error {
 	}
 
 	return nil
+}
+
+func (s *service) Consume(ctx context.Context, queueName string) (<-chan DeliveryMessage, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	if s.closed {
+		return nil, fmt.Errorf("service is closed")
+	}
+
+	// Declare queue if it doesn't exist
+	q, err := s.ch.QueueDeclare(
+		queueName,
+		true,  // durable
+		false, // autoDelete
+		false, // exclusive
+		false, // noWait
+		nil,   // args
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to declare queue: %v", err)
+	}
+
+	// Bind queue to exchange
+	err = s.ch.QueueBind(
+		q.Name,
+		q.Name, // Using queue name as routing key
+		s.config.ExchangeName,
+		false, // noWait
+		nil,   // args
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to bind queue: %v", err)
+	}
+
+	// Start consuming
+	deliveries, err := s.ch.Consume(
+		q.Name,
+		"",    // consumer tag
+		false, // autoAck
+		false, // exclusive
+		false, // noLocal
+		false, // noWait
+		nil,   // args
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to consume from queue: %v", err)
+	}
+
+	// Create a channel to pass converted messages
+	deliveryChan := make(chan DeliveryMessage)
+
+	// Start a goroutine to handle context cancellation and message conversion
+	go func() {
+		defer close(deliveryChan)
+
+		for {
+			select {
+			case <-ctx.Done():
+				s.log.InfoContext(ctx, "context cancelled, stopping consumption")
+				return
+			case d, ok := <-deliveries:
+				if !ok {
+					s.log.InfoContext(ctx, "deliveries channel closed, stopping consumption")
+					return
+				}
+
+				// Convert amqp.Delivery to DeliveryMessage
+				deliveryChan <- DeliveryMessage{
+					Body: d.Body,
+					Ack: func(multiple bool) error {
+						return d.Ack(multiple)
+					},
+					Nack: func(multiple bool, requeue bool) error {
+						return d.Nack(multiple, requeue)
+					},
+				}
+			}
+		}
+	}()
+
+	return deliveryChan, nil
 }

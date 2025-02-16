@@ -37,7 +37,7 @@ func main() {
 		ExchangeName:   cfg.Rabbitmq.ExchangeName,
 		ReconnectDelay: cfg.Rabbitmq.ReconnectDelay * time.Second,
 		MaxRetries:     cfg.Rabbitmq.MaxRetries,
-	})
+	}, log)
 	if err != nil {
 		log.ErrorContext(ctx, "failed to create RabbitMQ service", "error", err)
 	}
@@ -59,6 +59,4 @@ func main() {
 	if err := worker.Start(ctx); err != nil {
 		log.ErrorContext(ctx, "failed to start producer worker", "error", err)
 	}
-
-	fmt.Print("Hello World")
 }

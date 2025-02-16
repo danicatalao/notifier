@@ -8,12 +8,12 @@ import (
 
 type (
 	Config struct {
-		Pg       `env-prefix:"PG_" env-required:"true"`
-		Rabbitmq `env-prefix:"RABBITMQ_" env-required:"true"`
-		Worker   `env-prefix:"WORKER_" env-required:"true"`
+		PG                `env-prefix:"PG_" env-required:"true"`
+		FORECAST_PROVIDER `env-prefix:"FORECAST_PROVIDER_" env-required:"true"`
+		Rabbitmq          `env-prefix:"RABBITMQ_" env-required:"true"`
 	}
 
-	Pg struct {
+	PG struct {
 		Url           string `env:"URL"`
 		ConnAttempts  int    `env:"CONN_ATTEMPTS"`
 		ConnTimeoutMs int    `env:"CONN_TIMEOUT_MS"`
@@ -27,9 +27,8 @@ type (
 		ReconnectDelay time.Duration `env:"RECONNECT_DELAY"`
 	}
 
-	Worker struct {
-		PollInterval time.Duration `env:"POLL_INTERVAL"`
-		BatchSize    uint64        `env:"BATCH_SIZE"`
+	FORECAST_PROVIDER struct {
+		Url string `env:"URL"`
 	}
 )
 

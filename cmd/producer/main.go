@@ -13,17 +13,23 @@ import (
 	"github.com/danicatalao/notifier/internal/scheduled_notification"
 	postgres "github.com/danicatalao/notifier/pkg/database"
 	"github.com/danicatalao/notifier/pkg/rabbitmq"
+	"github.com/lmittmann/tint"
 )
 
 func main() {
 	ctx := context.Background()
 
 	//log := slog.Make(sloghuman.Sink(os.Stdout))
-	handler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelDebug,
-	})
-	log := slog.New(handler)
-	slog.SetDefault(log)
+	// handler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+	// 	Level: slog.LevelDebug,
+	// })
+	log := slog.New(tint.NewHandler(os.Stderr, nil))
+	slog.SetDefault(slog.New(
+		tint.NewHandler(os.Stderr, &tint.Options{
+			Level:      slog.LevelDebug,
+			TimeFormat: time.DateTime,
+		}),
+	))
 
 	// Loading .env variables into config
 	cfg, err := configs.NewConfig(".env")
@@ -37,7 +43,7 @@ func main() {
 		ExchangeName:   cfg.Rabbitmq.ExchangeName,
 		ReconnectDelay: cfg.Rabbitmq.ReconnectDelay * time.Second,
 		MaxRetries:     cfg.Rabbitmq.MaxRetries,
-	})
+	}, log)
 	if err != nil {
 		log.ErrorContext(ctx, "failed to create RabbitMQ service", "error", err)
 	}
@@ -59,6 +65,4 @@ func main() {
 	if err := worker.Start(ctx); err != nil {
 		log.ErrorContext(ctx, "failed to start producer worker", "error", err)
 	}
-
-	fmt.Print("Hello World")
 }
