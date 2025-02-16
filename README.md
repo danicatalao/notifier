@@ -47,3 +47,22 @@ docker compose up
 ```
 ### Como interagir com o sistema
 
+POST localhost:8081/api/v1/users
+```json
+{
+    "name": "Michael Scott",
+    "email": "m.s@dundermifflin.com",
+    "phone_number":"21982438803",
+    "webhook":"www.google.com"
+}
+```
+
+POST localhost:8081/api/v1/notification
+```json
+{
+   "date": "2025-02-16T04:32:00Z",
+   "city_name": "rio de janeiro",
+   "user_id": 1,
+   "notification_type": "webhook"
+}
+```
