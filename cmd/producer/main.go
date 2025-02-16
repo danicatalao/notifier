@@ -35,6 +35,7 @@ func main() {
 	cfg, err := configs.NewConfig(".env")
 	if err != nil {
 		log.ErrorContext(ctx, "Config error", "error", err)
+		os.Exit(1)
 	}
 	fmt.Printf("%+v\n", cfg)
 
