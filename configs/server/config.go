@@ -4,22 +4,22 @@ import "github.com/ilyakaznacheev/cleanenv"
 
 type (
 	Config struct {
-		PG                `env-prefix:"PG_" env-required:"true"`
-		HTTP              `env-prefix:"HTTP_" env-required:"true"`
-		FORECAST_PROVIDER `env-prefix:"FORECAST_PROVIDER_" env-required:"true"`
+		Pg               `env-prefix:"PG_" env-required:"true"`
+		Http             `env-prefix:"HTTP_" env-required:"true"`
+		ForecastProvider `env-prefix:"FORECAST_PROVIDER_" env-required:"true"`
 	}
 
-	PG struct {
+	Pg struct {
 		Url           string `env:"URL"`
 		ConnAttempts  int    `env:"CONN_ATTEMPTS"`
 		ConnTimeoutMs int    `env:"CONN_TIMEOUT_MS"`
 	}
 
-	HTTP struct {
+	Http struct {
 		Port string `env:"PORT" env-default:"8080"`
 	}
 
-	FORECAST_PROVIDER struct {
+	ForecastProvider struct {
 		Url string `env:"URL"`
 	}
 )

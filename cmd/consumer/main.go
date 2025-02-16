@@ -62,7 +62,7 @@ func main() {
 	forecastApiClient := forecast.NewForecastApiClient(httpClient, cfg.ForecastProvider.Url, log)
 	forecastService := forecast.NewForecastService(forecastApiClient, log)
 
-	userRepository := user.NewUserRepository(db)
+	userRepository := user.NewUserRepository(db, log)
 	userService := user.NewUserService(userRepository)
 
 	worker, err := notification_consumer.NewWorker(messageBroker, userService, forecastService, log, cfg.Queue.Name)

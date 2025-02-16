@@ -22,7 +22,12 @@ func NewWebhookService(u user.UserService, f forecast.ForecastService, l l.Logge
 	}
 }
 
-func (s *webhook_service) Send(ctx context.Context) error {
-	s.log.InfoContext(ctx, "Webhook sent")
+func (s *webhook_service) Send(ctx context.Context, id int64, cityName string) error {
+	user, err := s.userService.GetByID(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	s.log.InfoContext(ctx, "Webhook sent", "usuario", &user)
 	return nil
 }

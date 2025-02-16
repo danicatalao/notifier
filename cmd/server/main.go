@@ -37,7 +37,7 @@ func main() {
 	}
 	fmt.Printf("%+v\n", cfg)
 
-	db, err := postgres.New(cfg.PG.Url, cfg.PG.ConnAttempts, cfg.PG.ConnTimeoutMs)
+	db, err := postgres.New(cfg.Pg.Url, cfg.Pg.ConnAttempts, cfg.Pg.ConnTimeoutMs)
 	if err != nil {
 		log.ErrorContext(ctx, "could not create connection pool on Postgres", "error", err)
 		os.Exit(1)
@@ -47,11 +47,11 @@ func main() {
 
 	httpClient := &http.Client{Timeout: 10 * time.Second}
 
-	forecastApiClient := forecast.NewForecastApiClient(httpClient, cfg.FORECAST_PROVIDER.Url, log)
+	forecastApiClient := forecast.NewForecastApiClient(httpClient, cfg.ForecastProvider.Url, log)
 	forecastService := forecast.NewForecastService(forecastApiClient, log)
 	forecastHandler := forecast.NewForecastHandler(forecastApiClient, forecastService, log)
 
-	userRepository := user.NewUserRepository(db)
+	userRepository := user.NewUserRepository(db, log)
 	userService := user.NewUserService(userRepository)
 	userHandler := user.NewUserHandler(userService)
 
@@ -68,5 +68,5 @@ func main() {
 		scheduledNotificationHandler.AddNotificationRoutes(v1)
 	}
 
-	r.Run(net.JoinHostPort("", cfg.HTTP.Port))
+	r.Run(net.JoinHostPort("", cfg.Http.Port))
 }

@@ -7,7 +7,7 @@ import (
 const APP_USER_TABLE = "app_user"
 
 type AppUser struct {
-	ID          int64      `json:"id" db:"id"`
+	Id          int64      `json:"id" db:"id"`
 	Name        string     `json:"name" db:"name" validate:"required,max=255"`
 	Email       string     `json:"email" db:"email" validate:"required,email,max=255"`
 	PhoneNumber *string    `json:"phone_number,omitempty" db:"phone_number" validate:"omitempty,max=15"`

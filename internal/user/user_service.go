@@ -7,10 +7,7 @@ import (
 
 type UserService interface {
 	CreateUser(ctx context.Context, user *AppUser) (int64, error)
-	// List(ctx context.Context) ([]AppUser, error)
-	// GetByID(ctx context.Context, id int64) (*AppUser, error)
-	// Update(ctx context.Context, user *AppUser) error
-	// Delete(ctx context.Context, id int64) error
+	GetByID(ctx context.Context, id int64) (*AppUser, error)
 }
 
 type user_service struct {
@@ -27,4 +24,12 @@ func (s *user_service) CreateUser(ctx context.Context, user *AppUser) (int64, er
 		return -1, fmt.Errorf("error trying to add a user: %w", err)
 	}
 	return id, nil
+}
+
+func (s *user_service) GetByID(ctx context.Context, id int64) (*AppUser, error) {
+	user, err := s.repository.GetById(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("error trying to get a user by Id: %w", err)
+	}
+	return user, nil
 }

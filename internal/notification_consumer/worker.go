@@ -52,7 +52,7 @@ func (w *Worker) handleMessage(ctx context.Context, body []byte) error {
 		return err
 	}
 
-	if err := w.notificationService.Send(ctx); err != nil {
+	if err := w.notificationService.Send(ctx, message.UserId, message.CityName); err != nil {
 		return err
 	}
 
