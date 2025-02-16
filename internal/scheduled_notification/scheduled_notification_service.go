@@ -3,6 +3,7 @@ package scheduled_notification
 import (
 	"context"
 	"fmt"
+	"time"
 
 	l "github.com/danicatalao/notifier/internal/logger"
 )
@@ -21,6 +22,9 @@ func NewScheduledNotificationService(r ScheduledNotificationRepository, l l.Logg
 }
 
 func (s *schedule_notification_service) CreateScheduledNotification(ctx context.Context, sn *ScheduledNotification) error {
+	if sn.Date.IsZero() {
+		sn.Date = time.Now()
+	}
 	err := s.repository.Create(ctx, sn)
 	if err != nil {
 		return fmt.Errorf("error trying to schedule a notification: %w", err)
