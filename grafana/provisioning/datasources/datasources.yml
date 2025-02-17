@@ -1,9 +1,0 @@
-# ./grafana/provisioning/datasources/datasources.yaml
-apiVersion: 1
-
-datasources:
-  - name: go-api
-    type: prometheus
-    url: http://prometheus:9090
-    isDefault: true
-

@@ -73,36 +73,7 @@ services:
     depends_on:
       - db
       - rabbitmq
-
-  prometheus:
-    container_name: prometheus
-    image: prom/prometheus
-    restart: always
-    volumes:
-      - ./prometheus-data:/prometheus:rw
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - ./prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
-    ports:
-      - "9090:9090"
-    depends_on:
-      - server
-
-  grafana:
-    container_name: grafana
-    image: grafana/grafana:latest
-    restart: always
-    volumes:
-      - ./grafana-data:/var/lib/grafana:rw
-      - ./grafana/provisioning/:/etc/grafana/provisioning/:ro
-    ports:
-      - "3000:3000"
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-      - GF_LOG_MODE=console
-      - GF_LOG_LEVEL=error
-    depends_on:
-      - prometheus
-
+      
 volumes:
   pg-data:
   rabbitmq_data:

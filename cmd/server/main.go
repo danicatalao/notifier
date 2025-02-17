@@ -17,7 +17,6 @@ import (
 	postgres "github.com/danicatalao/notifier/pkg/database"
 	"github.com/gin-gonic/gin"
 	"github.com/lmittmann/tint"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
@@ -68,7 +67,6 @@ func main() {
 		userHandler.AddUserRoutes(v1)
 		scheduledNotificationHandler.AddNotificationRoutes(v1)
 	}
-	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	r.Run(net.JoinHostPort("", cfg.Http.Port))
 }
