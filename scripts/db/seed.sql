@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS app_user (
     phone_number VARCHAR(15),
     webhook TEXT,
     active BOOLEAN DEFAULT TRUE,
-    opt_out_date TIMESTAMPZ,
+    opt_out_date TIMESTAMPTZ,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
