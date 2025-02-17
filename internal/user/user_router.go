@@ -33,7 +33,7 @@ func validateUser(u CreateUserInput) error {
 		return fmt.Errorf("email missing")
 	}
 	if u.PhoneNumber == "" {
-		return fmt.Errorf("name missing")
+		return fmt.Errorf("phone_number missing")
 	}
 	if u.Webhook == "" {
 		return fmt.Errorf("webhook missing")
@@ -62,7 +62,7 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, &CreateUserReturn{id})
+	c.JSON(http.StatusCreated, &CreateUserReturn{id})
 }
 
 func (h *UserHandler) Optout(c *gin.Context) {
