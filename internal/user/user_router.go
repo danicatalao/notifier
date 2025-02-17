@@ -59,11 +59,15 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 
 	id, err := h.service.CreateUser(c.Request.Context(), &user)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		if strings.Contains(err.Error(), "duplicate key value") {
+			c.JSON(http.StatusConflict, gin.H{"error": "User email already in use"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"message": "User created", "Id": &CreateUserReturn{id}})
+	c.JSON(http.StatusCreated, gin.H{"message": "User created", "Id": id})
 }
 
 func (h *UserHandler) Optout(c *gin.Context) {
@@ -93,8 +97,4 @@ type CreateUserInput struct {
 	Email       string `json:"email"`
 	PhoneNumber string `json:"phone_number"`
 	Webhook     string `json:"webhook"`
-}
-
-type CreateUserReturn struct {
-	Id int64 `json:"id"`
 }

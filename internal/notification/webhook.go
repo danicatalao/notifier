@@ -55,7 +55,7 @@ func (s *webhook_service) Send(ctx context.Context, id int64, cityName string) e
 		return fmt.Errorf("could not parse forecast response")
 	}
 
-	s.log.InfoContext(ctx, "Sending Webhook", "usuario", &user.Id, "city", cityName, "content", string(jsonData))
+	s.log.InfoContext(ctx, "Sending Webhook", "usuario", user.Id, "city", cityName, "content", string(jsonData))
 
 	response, err := s.httpClient.Post(*user.Webhook, "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
