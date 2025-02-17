@@ -8,6 +8,7 @@ import (
 type UserService interface {
 	CreateUser(ctx context.Context, user *AppUser) (int64, error)
 	GetByID(ctx context.Context, id int64) (*AppUser, error)
+	OptOut(ctx context.Context, id int64) error
 }
 
 type user_service struct {
@@ -32,4 +33,12 @@ func (s *user_service) GetByID(ctx context.Context, id int64) (*AppUser, error) 
 		return nil, fmt.Errorf("error trying to get a user by Id: %w", err)
 	}
 	return user, nil
+}
+
+func (s *user_service) OptOut(ctx context.Context, id int64) error {
+	err := s.repository.DeactivateUser(ctx, id)
+	if err != nil {
+		return fmt.Errorf("error trying opt-out user %d: %w", id, err)
+	}
+	return nil
 }

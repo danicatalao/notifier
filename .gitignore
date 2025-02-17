@@ -10,3 +10,5 @@ go.work.sum
 /pg-data
 /rabbitmq_data
 /rabbitmq_log
+/grafana-data
+/prometheus-data

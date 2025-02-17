@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"fmt"
+	"time"
 
 	l "github.com/danicatalao/notifier/internal/logger"
 
@@ -13,6 +14,7 @@ import (
 type UserRepository interface {
 	Create(ctx context.Context, user *AppUser) (int64, error)
 	GetById(ctx context.Context, id int64) (*AppUser, error)
+	DeactivateUser(ctx context.Context, id int64) error
 }
 
 type user_repository struct {
@@ -44,6 +46,27 @@ func (r *user_repository) Create(ctx context.Context, u *AppUser) (int64, error)
 		return -1, fmt.Errorf("queryrow failed: %w", err)
 	}
 	return id, nil
+}
+
+func (r *user_repository) DeactivateUser(ctx context.Context, id int64) error {
+	query, args, err := r.db.Builder.
+		Update(APP_USER_TABLE).
+		Set("active", false).
+		Set("opt_out_date", time.Now()).
+		Where(squirrel.Eq{"id": id}).
+		ToSql()
+
+	r.log.DebugContext(ctx, "Executing sql statement", "sql", query, "args", args)
+
+	if err != nil {
+		return fmt.Errorf("could not build query: %w", err)
+	}
+
+	_, err = r.db.Pool.Exec(ctx, query, args...)
+	if err != nil {
+		return fmt.Errorf("queryrow failed: %w", err)
+	}
+	return nil
 }
 
 func (r *user_repository) GetById(ctx context.Context, id int64) (*AppUser, error) {

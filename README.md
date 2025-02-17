@@ -47,6 +47,8 @@ docker compose up
 ```
 ### Como interagir com o sistema
 
+- Criação de usuário  
+Todo usuário criado vem ativado(aceita notificação) por padrão. Atenção ao webhook que será chamado ao recebimento de notificação.
 POST localhost:8081/api/v1/users
 ```json
 {
@@ -57,6 +59,8 @@ POST localhost:8081/api/v1/users
 }
 ```
 
+- Cria solicitação de notificação 
+A data precisa estar no formato ISO 8601
 POST localhost:8081/api/v1/notification
 ```json
 {
