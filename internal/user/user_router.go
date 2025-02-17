@@ -21,7 +21,7 @@ func (h *UserHandler) AddUserRoutes(r *gin.RouterGroup) {
 	userRoutes := r.Group("/users")
 	{
 		userRoutes.POST("/", h.CreateUser)
-		userRoutes.POST("/:id/opt-out", h.CreateUser)
+		userRoutes.POST("/opt-out/:id", h.Optout)
 	}
 }
 
@@ -47,7 +47,7 @@ func (h *UserHandler) Optout(c *gin.Context) {
 
 	userId, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -57,7 +57,7 @@ func (h *UserHandler) Optout(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, "Usuário desativado")
+	c.JSON(http.StatusOK, "User opted-out")
 }
 
 type CreateUserReturn struct {

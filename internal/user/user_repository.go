@@ -62,9 +62,12 @@ func (r *user_repository) DeactivateUser(ctx context.Context, id int64) error {
 		return fmt.Errorf("could not build query: %w", err)
 	}
 
-	_, err = r.db.Pool.Exec(ctx, query, args...)
+	result, err := r.db.Pool.Exec(ctx, query, args...)
 	if err != nil {
 		return fmt.Errorf("queryrow failed: %w", err)
+	}
+	if result.String() != "UPDATE 1" {
+		return fmt.Errorf("user not found")
 	}
 	return nil
 }
