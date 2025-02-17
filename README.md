@@ -166,6 +166,10 @@ Squirrel: Biblioteca para construção de queries SQL em Go.
 
 - Adicionar suporte para outros tipos de notificação (e-mail, SMS, push).
 
+- Adicionar um cache distribuido para armazenar dados da api externa
+
+- Criar um índice composto na tabela de notificação para as colunas status e date. O worker producer realiza a busca de notificação constantemente.
+
 - Implementar autenticação e autorização para a API.
 
 ## Referências
