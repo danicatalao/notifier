@@ -16,6 +16,7 @@ type Service struct {
 }
 
 func New(url string, connAttempts int, connTimeoutMs int) (*Service, error) {
+	time.Sleep(time.Millisecond * time.Duration(connTimeoutMs))
 	for i := 1; i <= connAttempts; i++ {
 		pool, err := pgxpool.New(context.Background(), url)
 		if err == nil {
@@ -23,12 +24,12 @@ func New(url string, connAttempts int, connTimeoutMs int) (*Service, error) {
 			pg.Builder = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 			return pg, nil
 		}
-		log.Print(fmt.Errorf("Error creating connection pool: %w", err))
+		log.Print(fmt.Errorf("error creating connection pool: %w", err))
 		log.Printf("Trying to connect to Postgres -- Attempts left: %d", connAttempts-i)
 
 		time.Sleep(time.Millisecond * time.Duration(connTimeoutMs))
 	}
-	return nil, fmt.Errorf("Postgres Service - Could not establish connection to Postgres")
+	return nil, fmt.Errorf("postgres Service - Could not establish connection to Postgres")
 }
 
 func (p *Service) Close() {
