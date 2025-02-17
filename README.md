@@ -6,8 +6,8 @@
 ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
 
 O Notifier é um sistema de notificações que fornece informações sobre clima e tempo de cidades, obtidas do CPTEC (Centro de Previsão de Tempo e Estudos Climáticos).
-O sistema permite a criação de usuários, opt-out (para parar de receber notificações) e o envio de notificações agendadas ou "o mais breve possível".
-As notificações incluem a previsão do tempo para uma cidade específica nos próximos 4 dias e, no caso de cidades litorâneas, a previsão de ondas para o dia atual.
+O sistema permite a criação de usuários, opt-out (não permite mais recebimento de notificação) e o envio de notificações agendadas ou "o mais breve possível".
+As notificações incluem a previsão do tempo para uma cidade específica nos próximos 4 dias e, no caso de cidades litorâneas, também a previsão de ondas para o dia atual.
 Atualmente, o sistema suporta apenas notificações via webhook, mas está arquitetado para receber suporte para outras formas de notificação.
 
 ![img.png](arquitetura_sistema.png)
