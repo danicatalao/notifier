@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -62,7 +63,7 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, &CreateUserReturn{id})
+	c.JSON(http.StatusCreated, gin.H{"message": "User created", "Id": &CreateUserReturn{id}})
 }
 
 func (h *UserHandler) Optout(c *gin.Context) {
@@ -76,11 +77,15 @@ func (h *UserHandler) Optout(c *gin.Context) {
 
 	err = h.service.OptOut(c, userId)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		if strings.Contains(err.Error(), "user not found") {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "User not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
 		return
 	}
 
-	c.JSON(http.StatusOK, "User opted-out")
+	c.JSON(http.StatusOK, gin.H{"message": "User opted-out"})
 }
 
 type CreateUserInput struct {
