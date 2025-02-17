@@ -134,6 +134,28 @@ docker compose up
    "notification_type": "webhook"
 }
 ```
+O campo "date" pode ser omitido para enviar uma notificação imediata.
+
+### Como testar o sistema
+
+1. Criar usuário e guardar id retornado.
+
+2. Solicitar um envio de notificação imediata (sem o campo "date") e validar se o webhook foi chamado.
+
+3. Solicitar um envio de notificação para uma data e horário da sua escolha e validar se o webhook foi chamado no momento correto.
+
+4. Realizar o opt-out do usuário.
+
+5. Solicitar um envio de notificação para o usuário. Verificar se não foi chamado o webhook e analisar o log do consumer com o motivo do não envio.
+```bash
+ERR Failed to process message queue=webhook.notifications error="user is not accepting notifications"
+```
+
+6. Caso não tenha um webhook para validar, o log do consumer indica o conteúdo da notificação (previsão do tempo) e o motivo da falha.
+```bash
+consumer    | Feb 17 05:41:06.153 INF Sending Webhook usuario=1 city="rio de janeiro" content="{"previsão_do_tempo":{"nome":"Rio de Janeiro","uf":"RJ","atualizacao":"2025-02-16","previsao":[{"dia":"2025-02-17","tempo":"pn","maxima":37,"minima":26,"iuv":0},{"dia":"2025-02-18","tempo":"pn","maxima":38,"minima":27,"iuv":0},{"dia":"2025-02-19","tempo":"pn","maxima":33,"minima":25,"iuv":0},{"dia":"2025-02-20","tempo":"pn","maxima":34,"minima":24,"iuv":0}]},"ondas_do_dia":{"nome":"Rio de Janeiro","uf":"RJ","atualizacao":"16-02-2025","manha":{"dia":"16-02-2025 12h Z","agitacao":"Fraco","altura":"1.4","direcao":"E","vento":"6.1","vento_dir":"ENE"},"tarde":{"dia":"16-02-2025 18h Z","agitacao":"Fraco","altura":"1.5","direcao":"ESE","vento":"8.7","vento_dir":"E"},"noite":{"dia":"16-02-2025 21h Z","agitacao":"Fraco","altura":"1.5","direcao":"ESE","vento":"8.9","vento_dir":"ENE"}}}"
+consumer    | Feb 17 05:41:06.153 ERR Failed to process message queue=webhook.notifications error="could not request the webhook"
+```
 
 ## 🛠️ Tecnologias Utilizadas
 
