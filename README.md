@@ -156,9 +156,17 @@ Squirrel: Biblioteca para construção de queries SQL em Go.
 
 ## Próximos Passos
 
+- Adicionar testes unitários e de integração
+
+- Adicionar feature de histórico de envio de notificação
+
+- Adicionar rota de consulta de usuário
+
+- Adicionar rota de edição de informações de usuário
+
 - Adicionar suporte para outros tipos de notificação (e-mail, SMS, push).
 
-- Implementar autenticação e autorização para as APIs.
+- Implementar autenticação e autorização para a API.
 
 ## Referências
 
