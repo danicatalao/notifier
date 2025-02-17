@@ -4,8 +4,6 @@
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 ![RabbitMQ](https://img.shields.io/badge/Rabbitmq-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white)
 ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
-![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=for-the-badge&logo=Prometheus&logoColor=white)
-![Grafana](https://img.shields.io/badge/grafana-%23F46800.svg?style=for-the-badge&logo=grafana&logoColor=white)
 
 O Notifier é um sistema de notificações que fornece informações sobre o clima e o tempo,
 obtidas do CPTEC (Centro de Previsão de Tempo e Estudos Climáticos).
@@ -45,11 +43,6 @@ Consulta de previsão do tempo e de ondas para cidades brasileiras.
 
 Utilização de RabbitMQ para gerenciamento de mensagens e notificações.
 
-### Observabilidade
-
-Dashboard com métricas de disponibilidade e desempenho da API,
-utilizando Prometheus e Grafana.
-
 ## Arquitetura da Solução
 
 ### Componentes
@@ -79,11 +72,6 @@ de notificação, já pensando na escalabilidade da aplicação.
       - email.notifications
       - sms.notifications
       - push.notifications
-
-- **Prometheus e Grafana**\
-Coleta de métricas de desempenho, emissão de alertas em caso de
-indisponibilidade da api e dashboards com os dados de uso de recurso por parte
-da aplicação.
 
 ## 🛠️ Configuração e Uso
 
@@ -161,17 +149,13 @@ consumer    | Feb 17 05:41:06.153 ERR Failed to process message queue=webhook.no
 
 Go: Linguagem principal para desenvolvimento das APIs e workers.
 
+Gin: Framework web HTTP
+
 Docker: Conteinerização da aplicação.
 
 PostgreSQL: Banco de dados para armazenamento de usuários e notificações.
 
 RabbitMQ: Sistema de mensageria para gerenciamento de filas.
-
-Prometheus: Coleta de métricas de desempenho e emissão de
-alertas em caso de indisponibilidade da api, garantindo a
-rápida ação para restaurar o sistema.
-
-Grafana: Visualização das métricas coletadas pelo Prometheus.
 
 Squirrel: Biblioteca para construção de queries SQL em Go.
 
@@ -187,11 +171,5 @@ Squirrel: Biblioteca para construção de queries SQL em Go.
    1. **listaCidade**: Obter identificador da cidade.
    1. **previsao**: Obter previsão do tempo para 4 dias.
    1. **ondas**: Obter previsão de ondas.
-
-- [Dashboard de Observabilidade no compose](https://grafana.com/docs/grafana/latest/administration/provisioning/)
-
-- [Instrumentando aplicação com Prometheus](https://prometheus.io/docs/guides/go-application/)
-
-- [Criando alertas no Prometheus](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/)
 
 - [Documentação do Framework GIN](https://gin-gonic.com/)
