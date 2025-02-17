@@ -8,7 +8,7 @@
 O Notifier é um sistema de notificações que fornece informações sobre clima e tempo de cidades, obtidas do CPTEC (Centro de Previsão de Tempo e Estudos Climáticos).
 O sistema permite a criação de usuários, opt-out (não permite mais recebimento de notificação) e o envio de notificações agendadas ou "o mais breve possível".
 As notificações incluem a previsão do tempo para uma cidade específica nos próximos 4 dias e, no caso de cidades litorâneas, também a previsão de ondas para o dia atual.
-Atualmente, o sistema suporta apenas notificações via webhook, mas está arquitetado para receber suporte para outras formas de notificação.
+Atualmente, o sistema suporta apenas notificações via webhook, mas está arquitetado para receber suporte para outras formas de notificação (sms, push e email).
 
 ![img.png](arquitetura_sistema.png)
 
@@ -62,8 +62,7 @@ Banco de dados PostgreSQL para persistência dos dados de usuários e notificaç
 
 - **Serviço de Mensageria**\
 Brooker RabbitMQ com uma exchange chamada notifications e filas para cada tipo
-de notificação, já pensando na escalabilidade da aplicação.
-
+de notificação, incluindo futuros suportes.
       - webhook.notifications
       - email.notifications
       - sms.notifications
@@ -118,7 +117,7 @@ docker compose up
    "notification_type": "webhook"
 }
 ```
-O campo "date" pode ser omitido para enviar uma notificação imediata.
+**O campo "date" pode ser omitido para enviar uma notificação imediata.**
 
 ### Como testar o sistema
 
