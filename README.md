@@ -120,8 +120,11 @@ docker compose up
 }
 ```
 
+- **Desativar recebimento de notificação de um usuário**:\
+`PUT localhost:8081/api/v1/users/opt-out/{id}`
+
 - **Solicitar uma Notificação**:\
-`POST localhost:8081/api/v1/notification`
+`PUT localhost:8081/api/v1/notification`
 
 ```json
 {

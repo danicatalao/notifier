@@ -21,17 +21,40 @@ func (h *UserHandler) AddUserRoutes(r *gin.RouterGroup) {
 	userRoutes := r.Group("/users")
 	{
 		userRoutes.POST("/", h.CreateUser)
-		userRoutes.POST("/opt-out/:id", h.Optout)
+		userRoutes.PUT("/opt-out/:id", h.Optout)
 	}
 }
 
+func validateUser(u CreateUserInput) error {
+	if u.Name == "" {
+		return fmt.Errorf("name missing")
+	}
+	if u.Email == "" {
+		return fmt.Errorf("email missing")
+	}
+	if u.PhoneNumber == "" {
+		return fmt.Errorf("name missing")
+	}
+	if u.Webhook == "" {
+		return fmt.Errorf("webhook missing")
+	}
+	return nil
+}
+
 func (h *UserHandler) CreateUser(c *gin.Context) {
-	var user AppUser
-	if err := c.ShouldBindJSON(&user); err != nil {
+	var u CreateUserInput
+
+	if err := c.ShouldBindJSON(&u); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
-	fmt.Printf("%+v\n", user)
+	if err := validateUser(u); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	user := AppUser{Name: u.Name, Email: u.Email, PhoneNumber: &u.PhoneNumber, Webhook: &u.Webhook}
 
 	id, err := h.service.CreateUser(c.Request.Context(), &user)
 	if err != nil {
@@ -58,6 +81,13 @@ func (h *UserHandler) Optout(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, "User opted-out")
+}
+
+type CreateUserInput struct {
+	Name        string `json:"name"`
+	Email       string `json:"email"`
+	PhoneNumber string `json:"phone_number"`
+	Webhook     string `json:"webhook"`
 }
 
 type CreateUserReturn struct {
